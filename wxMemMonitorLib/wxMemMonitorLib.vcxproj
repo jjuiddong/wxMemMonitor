@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{85D2A85F-2C05-48E7-BEE9-EF95281537DF}</ProjectGuid>
+    <ProjectGuid>{20D4FC42-81E1-469F-8697-705005321531}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>wxMemMonitor</RootNamespace>
+    <RootNamespace>wxMemMonitorLib</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -72,13 +72,18 @@
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="UI\App.h" />
+    <ClInclude Include="UI\Frame.h" />
     <ClInclude Include="wxMemMonitor.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Control\wxMemMonitor.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="UI\App.cpp" />
+    <ClCompile Include="UI\Frame.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,6 +4,10 @@
 #include "stdafx.h"
 #include "Target.h"
 
+#include "../wxMemMonitorLib/wxMemMonitor.h"
+MEMORYMONITOR_INNER_PROCESS();
+
+
 #define MAX_LOADSTRING 100
 
 // 전역 변수:
@@ -42,6 +46,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_TARGET));
 
+	memmonitor::Init( memmonitor::INNER_PROCESS, hInstance );
+
 	// 기본 메시지 루프입니다.
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
@@ -52,6 +58,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		}
 	}
 
+	memmonitor::Cleanup();
 	return (int) msg.wParam;
 }
 
