@@ -20,9 +20,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Src\헤더 파일</Filter>
     </ClInclude>
@@ -34,6 +31,9 @@
       <Filter>Src\ui</Filter>
     </ClInclude>
     <ClInclude Include="UI\MemoryTree.h">
+      <Filter>Src\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\LogWindow.h">
       <Filter>Src\ui</Filter>
     </ClInclude>
   </ItemGroup>
@@ -51,6 +51,9 @@
       <Filter>Src\Control</Filter>
     </ClCompile>
     <ClCompile Include="UI\MemoryTree.cpp">
+      <Filter>Src\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\LogWindow.cpp">
       <Filter>Src\ui</Filter>
     </ClCompile>
   </ItemGroup>
