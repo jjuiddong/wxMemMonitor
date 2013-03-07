@@ -72,8 +72,8 @@
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="UI\App.h" />
     <ClInclude Include="UI\Frame.h" />
+    <ClInclude Include="UI\MemoryTree.h" />
     <ClInclude Include="wxMemMonitor.h" />
   </ItemGroup>
   <ItemGroup>
@@ -84,6 +84,7 @@
     </ClCompile>
     <ClCompile Include="UI\App.cpp" />
     <ClCompile Include="UI\Frame.cpp" />
+    <ClCompile Include="UI\MemoryTree.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

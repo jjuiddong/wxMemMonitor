@@ -56,6 +56,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+		memmonitor::Loop(msg);
 	}
 
 	memmonitor::Cleanup();

@@ -30,10 +30,10 @@
       <Filter>Src\헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="wxMemMonitor.h" />
-    <ClInclude Include="UI\App.h">
+    <ClInclude Include="UI\Frame.h">
       <Filter>Src\ui</Filter>
     </ClInclude>
-    <ClInclude Include="UI\Frame.h">
+    <ClInclude Include="UI\MemoryTree.h">
       <Filter>Src\ui</Filter>
     </ClInclude>
   </ItemGroup>
@@ -49,6 +49,9 @@
     </ClCompile>
     <ClCompile Include="Control\wxMemMonitor.cpp">
       <Filter>Src\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\MemoryTree.cpp">
+      <Filter>Src\ui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

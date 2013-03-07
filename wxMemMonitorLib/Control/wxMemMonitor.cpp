@@ -1,6 +1,7 @@
 
 #include "stdafx.h"
 #include "../wxMemMonitor.h"
+#include "wx/evtloop.h"
 
 namespace memmonitor
 {
@@ -36,6 +37,21 @@ bool memmonitor::Init(EXECUTE_TYPE type, HINSTANCE hInst)
 //------------------------------------------------------------------------
 // 
 //------------------------------------------------------------------------
+void memmonitor::Loop(MSG &msg)
+{
+	wxEventLoop * const
+		evtLoop = static_cast<wxEventLoop *>(wxEventLoop::GetActive());
+	if ( evtLoop && evtLoop->PreProcessMessage(&msg) )
+		return;
+
+	if (wxTheApp) 
+		wxTheApp->ProcessIdle(); // 이 함수를 호출해야 wxAuiManager Docking이 작동한다.
+}
+
+
+//------------------------------------------------------------------------
+// 
+//------------------------------------------------------------------------
 void memmonitor::Cleanup()
 {
 	if (INNER_PROCESS == n_Type)
@@ -45,3 +61,5 @@ void memmonitor::Cleanup()
 		wxEntryCleanup();
 	}
 }
+
+
