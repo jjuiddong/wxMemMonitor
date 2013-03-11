@@ -18,6 +18,12 @@
     <Filter Include="Src\Control">
       <UniqueIdentifier>{296134f8-63a0-4f5f-97df-290a73ebce4f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\visualizer">
+      <UniqueIdentifier>{b33e7d87-bc07-404a-b165-a74dc8145041}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\dia">
+      <UniqueIdentifier>{6b3aea34-e4a5-4662-bbbb-e28280778d81}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -35,6 +41,36 @@
     </ClInclude>
     <ClInclude Include="UI\LogWindow.h">
       <Filter>Src\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\PropertyWindow.h">
+      <Filter>Src\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="visualizer\VisualizerDefine.h">
+      <Filter>Src\visualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="visualizer\VisualizerGlobal.h">
+      <Filter>Src\visualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="visualizer\VisualizerParser.h">
+      <Filter>Src\visualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="visualizer\VisualizerScanner.h">
+      <Filter>Src\visualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="visualizer\DefaultPropertyMaker.h">
+      <Filter>Src\visualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="dia\DiaWrapper.h">
+      <Filter>Src\dia</Filter>
+    </ClInclude>
+    <ClInclude Include="visualizer\PropertyMaker.h">
+      <Filter>Src\visualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\PropertyGrid.h">
+      <Filter>Src\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="Control\Global.h">
+      <Filter>Src\Control</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +91,36 @@
     </ClCompile>
     <ClCompile Include="UI\LogWindow.cpp">
       <Filter>Src\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\PropertyWindow.cpp">
+      <Filter>Src\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="visualizer\VisualizerDefine.cpp">
+      <Filter>Src\visualizer</Filter>
+    </ClCompile>
+    <ClCompile Include="visualizer\VisualizerGlobal.cpp">
+      <Filter>Src\visualizer</Filter>
+    </ClCompile>
+    <ClCompile Include="visualizer\VisualizerParser.cpp">
+      <Filter>Src\visualizer</Filter>
+    </ClCompile>
+    <ClCompile Include="visualizer\VisualizerScanner.cpp">
+      <Filter>Src\visualizer</Filter>
+    </ClCompile>
+    <ClCompile Include="visualizer\DefaultPropertyMaker.cpp">
+      <Filter>Src\visualizer</Filter>
+    </ClCompile>
+    <ClCompile Include="dia\DiaWrapper.cpp">
+      <Filter>Src\dia</Filter>
+    </ClCompile>
+    <ClCompile Include="visualizer\PropertyMaker.cpp">
+      <Filter>Src\visualizer</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\PropertyGrid.cpp">
+      <Filter>Src\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="Control\Global.cpp">
+      <Filter>Src\Control</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

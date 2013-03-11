@@ -5,6 +5,8 @@
 
 #pragma once
 
+#define _CRT_SECURE_NO_DEPRECATE // warning elimination (strcpy -> strcpy_s )
+
 #include "targetver.h"
 
 #define WIN32_LEAN_AND_MEAN             // 거의 사용되지 않는 내용은 Windows 헤더에서 제외합니다.
@@ -12,7 +14,25 @@
 
 
 /////////////////////////////////////////////////////////
+#include "dia2.h"
+
 #include "wx/wxprec.h"
 #ifndef WX_PRECOMP
 	#include "wx/wx.h"
 #endif
+
+#include "../Common/Common.h"
+
+#define ASSERT( x )		assert( (x) )
+
+
+struct STypeData
+{
+	enum SymTagEnum symtag;
+	VARTYPE vt;
+	void *ptr;
+	STypeData( enum SymTagEnum _symtag,  VARTYPE _vt, void *_ptr) : 
+	symtag(_symtag), vt(_vt), ptr(_ptr) { }
+	STypeData() {}
+};
+

@@ -3,6 +3,7 @@
 #include "Frame.h"
 #include "MemoryTree.h"
 #include "LogWindow.h"
+#include "PropertyWindow.h"
 
 using namespace memmonitor;
 
@@ -16,20 +17,21 @@ CFrame::CFrame(wxWindow* parent) : wxFrame(parent, -1, _("wxAUI Test"),
 
 	CMemoryTree* memTree = new CMemoryTree(this);
 	memTree->Init();
-
 	CLogWindow *logWnd = new CLogWindow(this);
-
-	wxTextCtrl *text3 = new wxTextCtrl(this, wxID_ANY, _("Pane 3 - sample text"),
-		wxDefaultPosition, wxSize(200,150),
-		wxTE_MULTILINE | wxSUNKEN_BORDER);
+	CPropertyWindow *propWnd = new CPropertyWindow(this);
+	wxTextCtrl *text3 = new wxTextCtrl(this, wxID_ANY, wxT(" "), 
+		wxDefaultPosition, wxSize(200,150),  wxTE_READONLY | wxSUNKEN_BORDER);
 
 	// add the panes to the manager
 	m_mgr.AddPane(memTree, wxLEFT, wxT("Memory Tree"));
-	m_mgr.AddPane(logWnd, wxBOTTOM, wxT("Pane Number Two"));
+	m_mgr.AddPane(propWnd, wxRIGHT, wxT("Properties"));
+	m_mgr.AddPane(logWnd, wxBOTTOM, wxT("Log Window"));
 	m_mgr.AddPane(text3, wxCENTER);
 
 	// tell the manager to "commit" all the changes just made
 	m_mgr.Update();
+
+	
 }
 
 CFrame::~CFrame()

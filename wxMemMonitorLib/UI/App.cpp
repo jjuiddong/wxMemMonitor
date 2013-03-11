@@ -23,4 +23,3 @@ void CApp::ExitMainLoop()
 	// instead of existing wxWidgets main loop, terminate the MFC one
 	::PostQuitMessage(0);
 }
-

@@ -81,8 +81,8 @@ typedef unsigned short u_short;
 
 #define RET(exp)		{if((exp)) return; }			// exp가 true이면 리턴
 #define RETV(exp,val)	{if((exp)) return val; }
-#define ASSERT_RET(exp)		{ASSERT(exp); RET(!(exp) ); }
-#define ASSERT_RETV(exp,val)		{ASSERT(exp); RETV(!(exp),val ); }
+#define ASSERT_RET(exp)		{assert(exp); RET(!(exp) ); }
+#define ASSERT_RETV(exp,val)		{assert(exp); RETV(!(exp),val ); }
 
 
 // WinDef.h 에 정의 되어 있다.

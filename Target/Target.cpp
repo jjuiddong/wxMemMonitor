@@ -46,7 +46,11 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_TARGET));
 
-	memmonitor::Init( memmonitor::INNER_PROCESS, hInstance );
+	if (!memmonitor::Init( memmonitor::INNER_PROCESS, hInstance, "config_bounceball.json" ))
+	{
+		::MessageBoxA(NULL, memmonitor::GetLastError().c_str(), "ERROR", MB_OK);
+		return FALSE;
+	}
 
 	// 기본 메시지 루프입니다.
 	while (GetMessage(&msg, NULL, 0, 0))

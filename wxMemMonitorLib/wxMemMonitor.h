@@ -37,9 +37,12 @@ namespace memmonitor
 		OUTER_PROCESS,		// using shared memory
 	};
 
-	bool Init(EXECUTE_TYPE type, HINSTANCE hInst);
+	bool Init(EXECUTE_TYPE type, HINSTANCE hInst, const std::string configFileName);
 	void Loop(MSG &msg);
 	void Cleanup();
+	
+	// Error Report
+	const std::string& GetLastError();
 
 
 	class CApp : public wxApp
