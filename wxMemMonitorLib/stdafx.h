@@ -14,6 +14,8 @@
 
 
 /////////////////////////////////////////////////////////
+#define ASSERT( x )		assert( (x) )
+
 #include "dia2.h"
 
 #include "wx/wxprec.h"
@@ -22,8 +24,6 @@
 #endif
 
 #include "../Common/Common.h"
-
-#define ASSERT( x )		assert( (x) )
 
 
 struct STypeData
@@ -36,3 +36,17 @@ struct STypeData
 	STypeData() {}
 };
 
+
+namespace memmonitor
+{
+	class CMemoryTree;
+	class CLogWindow;
+	class CPropertyWindow;
+
+	typedef common::ReferencePtr<CMemoryTree> MemTreePtr;
+	typedef common::ReferencePtr<CLogWindow> LogWindowPtr;
+	typedef common::ReferencePtr<CPropertyWindow> PropWindowPtr;
+
+}
+
+#include "wxMemMonitor.h"

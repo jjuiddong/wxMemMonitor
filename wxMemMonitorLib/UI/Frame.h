@@ -17,8 +17,19 @@ namespace memmonitor
 		CFrame(wxWindow* parent);
 		virtual ~CFrame();
 
+		MemTreePtr GetMemTree() const;
+		LogWindowPtr GetLogWindow() const;
+		PropWindowPtr GetPropWindow() const;
+		
 	private:
 		wxAuiManager m_mgr;
+		MemTreePtr m_pMemTree;
+		LogWindowPtr m_pLogWnd;
+		PropWindowPtr m_pPropWnd;
 	};
+
+	inline MemTreePtr CFrame::GetMemTree() const { return m_pMemTree; }
+	inline LogWindowPtr CFrame::GetLogWindow() const { return m_pLogWnd; }
+	inline PropWindowPtr CFrame::GetPropWindow() const { return m_pPropWnd; }
 
 }

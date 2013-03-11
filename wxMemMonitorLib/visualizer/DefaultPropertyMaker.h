@@ -13,7 +13,7 @@
 namespace memmonitor 
 {
 	class CPropertyWindow; 
-	class CPropertyGrid;
+	class CPropertyItem;
 }
 
 namespace visualizer
@@ -22,16 +22,16 @@ namespace visualizer
 
 	bool		MakeProperty_DefaultForm( CPropertyWindow *pProperties,  const std::string &symbolName );
 
-	bool		MakeProperty_DefaultForm( CPropertyWindow *pProperties, CPropertyGrid *pParentProp,  
+	bool		MakeProperty_DefaultForm( CPropertyWindow *pProperties, CPropertyItem *pParentProp,  
 		const std::string &symbolName );
 
-	bool		MakeProperty_DefaultForm(  CPropertyWindow *pProperties, CPropertyGrid *pParentProp,  
+	bool		MakeProperty_DefaultForm(  CPropertyWindow *pProperties, CPropertyItem *pParentProp,  
 		const SSymbolInfo &symbol );
 
-	bool		MakePropertyChild_DefaultForm(  CPropertyWindow *pProperties, CPropertyGrid *pParentProp,  
+	bool		MakePropertyChild_DefaultForm(  CPropertyWindow *pProperties, CPropertyItem *pParentProp,  
 		const SSymbolInfo &symbol );
 
-	bool		SetPropertyValue(CPropertyGrid *pProp, _variant_t value);
+	bool		SetPropertyValue(CPropertyItem *pProp, _variant_t value);
 
 }
 

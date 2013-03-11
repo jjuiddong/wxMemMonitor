@@ -12,11 +12,11 @@
 
 namespace memmonitor
 {
-	class CPropertyGrid : public wxPGProperty
+	class CPropertyItem : public wxPGProperty
 	{
 	public:
-		CPropertyGrid( std::string label );
-		virtual ~CPropertyGrid();
+		CPropertyItem( std::string label );
+		virtual ~CPropertyItem();
 
 		void SetVariantValue( const _variant_t &var );
 		_variant_t GetVariantValue();

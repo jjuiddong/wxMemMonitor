@@ -15,16 +15,21 @@ namespace visualizer
 
 namespace memmonitor
 {
-	class CPropertyGrid;
+	class CPropertyItem;
 	class CPropertyWindow : public wxPropertyGridManager
 	{
 	public:
 		CPropertyWindow(wxWindow *parent);
 		virtual ~CPropertyWindow();
 
+		void UpdateSymbol( const wxString &symbolName );
+
 		void OnPropertyGridChange( wxPropertyGridEvent& event );
-		void	AddProperty(CPropertyGrid *pParentProp, CPropertyGrid *prop, 
+		void	AddProperty(CPropertyItem *pParentProp, CPropertyItem *prop, 
 			const visualizer::SSymbolInfo *pSymbol, STypeData *pTypeData);
+
+	protected:
+		wxString	m_CurrentSymbolName;
 
 	};
 }

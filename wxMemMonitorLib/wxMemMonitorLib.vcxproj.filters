@@ -66,11 +66,11 @@
     <ClInclude Include="visualizer\PropertyMaker.h">
       <Filter>Src\visualizer</Filter>
     </ClInclude>
-    <ClInclude Include="UI\PropertyGrid.h">
-      <Filter>Src\ui</Filter>
-    </ClInclude>
     <ClInclude Include="Control\Global.h">
       <Filter>Src\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\PropertyItem.h">
+      <Filter>Src\ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -116,11 +116,11 @@
     <ClCompile Include="visualizer\PropertyMaker.cpp">
       <Filter>Src\visualizer</Filter>
     </ClCompile>
-    <ClCompile Include="UI\PropertyGrid.cpp">
-      <Filter>Src\ui</Filter>
-    </ClCompile>
     <ClCompile Include="Control\Global.cpp">
       <Filter>Src\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\PropertyItem.cpp">
+      <Filter>Src\ui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

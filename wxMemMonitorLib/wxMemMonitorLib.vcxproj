@@ -79,7 +79,7 @@
     <ClInclude Include="UI\Frame.h" />
     <ClInclude Include="UI\LogWindow.h" />
     <ClInclude Include="UI\MemoryTree.h" />
-    <ClInclude Include="UI\PropertyGrid.h" />
+    <ClInclude Include="UI\PropertyItem.h" />
     <ClInclude Include="UI\PropertyWindow.h" />
     <ClInclude Include="visualizer\DefaultPropertyMaker.h" />
     <ClInclude Include="visualizer\PropertyMaker.h" />
@@ -101,7 +101,7 @@
     <ClCompile Include="UI\Frame.cpp" />
     <ClCompile Include="UI\LogWindow.cpp" />
     <ClCompile Include="UI\MemoryTree.cpp" />
-    <ClCompile Include="UI\PropertyGrid.cpp" />
+    <ClCompile Include="UI\PropertyItem.cpp" />
     <ClCompile Include="UI\PropertyWindow.cpp" />
     <ClCompile Include="visualizer\DefaultPropertyMaker.cpp" />
     <ClCompile Include="visualizer\PropertyMaker.cpp" />

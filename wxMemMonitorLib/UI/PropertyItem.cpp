@@ -1,15 +1,15 @@
 
 #include "stdafx.h"
-#include "PropertyGrid.h"
+#include "PropertyItem.h"
 
 using namespace memmonitor;
 
-CPropertyGrid::CPropertyGrid( std::string label ) :
-	wxPGProperty(common::str2wstr(label), wxT(""))
+CPropertyItem::CPropertyItem( std::string label ) :
+	wxPGProperty(label, label)
 {
 }
 
-CPropertyGrid::~CPropertyGrid()
+CPropertyItem::~CPropertyItem()
 {
 
 }
@@ -19,7 +19,7 @@ CPropertyGrid::~CPropertyGrid()
 // convert _variant_t -> wxVariant 
 // and setting using SetValue(wxVariant&) member function
 //------------------------------------------------------------------------
-void CPropertyGrid::SetVariantValue( const _variant_t &var )
+void CPropertyItem::SetVariantValue( const _variant_t &var )
 {
 	const wxVariant wxVar = variant2wxVariant(var);
 	SetValue(wxVar);
@@ -29,7 +29,7 @@ void CPropertyGrid::SetVariantValue( const _variant_t &var )
 //------------------------------------------------------------------------
 // 
 //------------------------------------------------------------------------
-_variant_t CPropertyGrid::GetVariantValue()
+_variant_t CPropertyItem::GetVariantValue()
 {
 	const wxVariant wxVar = GetValue();
 	_variant_t var = wxVariant2variant(wxVar);

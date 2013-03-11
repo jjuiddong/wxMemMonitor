@@ -4,6 +4,9 @@
 #include "MemoryTree.h"
 #include "LogWindow.h"
 #include "PropertyWindow.h"
+#include "../dia/DiaWrapper.h"
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 using namespace memmonitor;
 
@@ -16,7 +19,6 @@ CFrame::CFrame(wxWindow* parent) : wxFrame(parent, -1, _("wxAUI Test"),
 	m_mgr.SetManagedWindow(this);
 
 	CMemoryTree* memTree = new CMemoryTree(this);
-	memTree->Init();
 	CLogWindow *logWnd = new CLogWindow(this);
 	CPropertyWindow *propWnd = new CPropertyWindow(this);
 	wxTextCtrl *text3 = new wxTextCtrl(this, wxID_ANY, wxT(" "), 
@@ -31,7 +33,9 @@ CFrame::CFrame(wxWindow* parent) : wxFrame(parent, -1, _("wxAUI Test"),
 	// tell the manager to "commit" all the changes just made
 	m_mgr.Update();
 
-	
+	m_pMemTree = memTree;
+	m_pLogWnd = logWnd;
+	m_pPropWnd = propWnd;	
 }
 
 CFrame::~CFrame()

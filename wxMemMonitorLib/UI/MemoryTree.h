@@ -9,16 +9,25 @@
 
 #include "wx/treectrl.h"
 
+class wxTreeCtrl;
 namespace memmonitor
 {
-	class CMemoryTree : public wxTreeCtrl
+	class CMemoryTree : public wxPanel
 	{
+		DECLARE_EVENT_TABLE()
+
 	public:
 		CMemoryTree(wxWindow *parent);
 		virtual ~CMemoryTree();
-		bool Init();
 
 	protected:
+		bool LoadMemoryMap();
+		bool UpdateMemoryMap();
+		void OnTreectrlSelChanged( wxTreeEvent& event );
+
+	protected:
+		enum { ID_TREE };
+		wxTreeCtrl *m_pTree;
 
 	};
 }

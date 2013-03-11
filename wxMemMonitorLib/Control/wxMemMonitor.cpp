@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "../wxMemMonitor.h"
 #include "wx/evtloop.h"
+#include "Global.h"
 #include "../dia/DiaWrapper.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -12,9 +13,6 @@ namespace memmonitor
 	// functions
 	bool	LoadConfigFile(const std::string &fileName);
 
-	// variables
-	EXECUTE_TYPE n_Type;
-	std::string g_ErrorMsg;
 }
 
 using namespace memmonitor;
@@ -27,7 +25,7 @@ using namespace memmonitor;
 //------------------------------------------------------------------------
 bool memmonitor::Init(EXECUTE_TYPE type, HINSTANCE hInst, const std::string configFileName)
 {
-	n_Type = type;
+	SetExecuteType(type);
 
 	if (INNER_PROCESS == type)
 	{
@@ -74,7 +72,7 @@ void memmonitor::Cleanup()
 	dia::CDiaWrapper::Get()->Release();
 	sharedmemory::Release();
 
-	if (INNER_PROCESS == n_Type)
+	if (INNER_PROCESS == GetExecuteType())
 	{
 		if ( wxTheApp )
 			wxTheApp->OnExit();
@@ -101,20 +99,23 @@ bool	memmonitor::LoadConfigFile(const std::string &fileName)
 		// Pdb Load
 		if (!dia::CDiaWrapper::Get()->Init(pdbPath))
 		{
-			g_ErrorMsg = common::format( "%s Pdb 파일이 없습니다.", pdbPath.c_str() );
+			SetErrorMsg(
+				common::format("%s Pdb 파일이 없습니다.", pdbPath.c_str()) );
 			return false;
 		}
 		if (!sharedmemory::Init(shareMemoryName, sharedmemory::SHARED_CLIENT))
 		{
-			g_ErrorMsg = common::format( "%s  이름의 공유메모리가 없습니다.", 
-				shareMemoryName.c_str() );
+			SetErrorMsg(
+				common::format("%s  이름의 공유메모리가 없습니다.", 
+				shareMemoryName.c_str()) );
 			return false;
 		}
 	}
 	catch (std::exception &e)
 	{
-		g_ErrorMsg = common::format( "\"%s\" json script Err!! [%s]",  
-			fileName.c_str(), e.what()).c_str();
+		SetErrorMsg(
+			common::format( "\"%s\" json script Err!! [%s]",  
+			fileName.c_str(), e.what()) );
 		return false;
 	}
 
@@ -127,6 +128,6 @@ bool	memmonitor::LoadConfigFile(const std::string &fileName)
 //------------------------------------------------------------------------
 const std::string& memmonitor::GetLastError()
 {
-	return g_ErrorMsg;
+	return GetErrorMsg();
 }
 

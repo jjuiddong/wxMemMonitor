@@ -70,7 +70,7 @@ visualizer::parser::SVisualizerScript *m_pVisScr = NULL;
 std::string m_SymbolName;
 sharedmemory::SMemoryInfo m_MemInfo;
 CPropertyWindow *m_pPropertiesCtrl= NULL;
-CPropertyGrid *m_pParentProperty = NULL;
+CPropertyItem *m_pParentProperty = NULL;
 
 
 class VisualizerScriptError
@@ -106,7 +106,7 @@ void visualizer::Release()
 // symbolName : 공유메모리에 저장된 심볼이름
 //------------------------------------------------------------------------
 bool	visualizer::MakeVisualizerProperty( CPropertyWindow *pPropertiesWnd, 
-											   CPropertyGrid *pParentProp, 
+											   CPropertyItem *pParentProp, 
 											   const SMemoryInfo &memInfo, const string &symbolName )
 {
 	const std::string str = sharedmemory::ParseObjectName(symbolName);
@@ -147,7 +147,7 @@ bool	visualizer::MakeVisualizerProperty( CPropertyWindow *pPropertiesWnd,
 // 
 //------------------------------------------------------------------------
 bool	visualizer::MakeVisualizerProperty( CPropertyWindow *pPropertiesWnd, 
-	CPropertyGrid *pParentProp, const SSymbolInfo &symbol )
+	CPropertyItem *pParentProp, const SSymbolInfo &symbol )
 {
 	// 타입심볼을 얻는다.
 	dia::SymbolState symState;
