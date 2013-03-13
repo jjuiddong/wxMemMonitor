@@ -14,10 +14,11 @@
 namespace memmonitor 
 { 
 	class CPropertyWindow; 
-	class CPropertyItem;
+	class CPropertyItemAdaptor;
 }
 
 struct IDiaSymbol;
+class wxPGProperty;
 namespace visualizer
 {
 	using namespace memmonitor;
@@ -28,11 +29,11 @@ namespace visualizer
 
 	// make property
 	bool	MakeVisualizerProperty( CPropertyWindow *pPropertiesWnd, 
-		CPropertyItem *pParentProp, 
+		wxPGProperty *pParentProp, 
 		const sharedmemory::SMemoryInfo &memInfo, const std::string &symbolName );
 
 	bool	MakeVisualizerProperty( CPropertyWindow *pPropertiesWnd, 
-		CPropertyItem *pParentProp, const SSymbolInfo &symbol );
+		wxPGProperty *pParentProp, const SSymbolInfo &symbol );
 
 	// find
 	bool Find_ChildSymbol(  const std::string findSymbolName, 

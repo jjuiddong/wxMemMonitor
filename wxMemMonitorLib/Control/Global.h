@@ -9,8 +9,15 @@
 
 namespace memmonitor
 {
-	//const std::string& GetConfigFileName();
-	//void SetConfigFileName(const std::string &fileName);
+	struct STypeData
+	{
+		enum SymTagEnum symtag;
+		VARTYPE vt;
+		void *ptr;
+		STypeData( enum SymTagEnum _symtag,  VARTYPE _vt, void *_ptr) : 
+		symtag(_symtag), vt(_vt), ptr(_ptr) { }
+		STypeData() {}
+	};
 
 
 	EXECUTE_TYPE		GetExecuteType();
@@ -22,5 +29,9 @@ namespace memmonitor
 
 	const std::string&	GetErrorMsg();
 	void							SetErrorMsg(const std::string&msg);
+
+	wxVariant					Variant2wxVariant(const _variant_t &var);
+	_variant_t				wxVariant2Variant(const wxVariant &wxVar);
+	_variant_t				wxVariant2Variant(const VARTYPE &vartype, const wxVariant &wxVar);
 
 }

@@ -26,17 +26,6 @@
 #include "../Common/Common.h"
 
 
-struct STypeData
-{
-	enum SymTagEnum symtag;
-	VARTYPE vt;
-	void *ptr;
-	STypeData( enum SymTagEnum _symtag,  VARTYPE _vt, void *_ptr) : 
-	symtag(_symtag), vt(_vt), ptr(_ptr) { }
-	STypeData() {}
-};
-
-
 namespace memmonitor
 {
 	class CMemoryTree;

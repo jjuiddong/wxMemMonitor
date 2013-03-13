@@ -4,7 +4,7 @@
 #include "PropertyMaker.h"
 #include "../dia/DiaWrapper.h"
 #include "../ui/PropertyWindow.h"
-#include "../ui/PropertyItem.h"
+#include "../ui/PropertyItemAdaptor.h"
 #include "VisualizerDefine.h"
 #include <atlbase.h>
 
@@ -17,37 +17,37 @@ namespace visualizer
 	CPropertyWindow *g_pProperty = NULL;
 
 	// make property
-	void		MakeProperty_Root(CPropertyItem *pParentProp, const SSymbolInfo &symbol, const int depth );
+	void		MakeProperty_Root(wxPGProperty *pParentProp, const SSymbolInfo &symbol, const int depth );
 
-	bool		MakeProperty_Child(  CPropertyItem *pParentProp,  const SSymbolInfo &symbol, const int depth );
+	bool		MakeProperty_Child(  wxPGProperty *pParentProp,  const SSymbolInfo &symbol, const int depth );
 
-	void		MakeProperty_UDTChild(CPropertyItem *pParentProp, const SSymbolInfo &symbol, const int depth );
+	void		MakeProperty_UDTChild(wxPGProperty *pParentProp, const SSymbolInfo &symbol, const int depth );
 
-	void		MakeProperty_BaseClass(CPropertyItem *pParentProp, const SSymbolInfo &symbol, const int depth );
+	void		MakeProperty_BaseClass(wxPGProperty *pParentProp, const SSymbolInfo &symbol, const int depth );
 
-	void		MakeProperty_Pointer(CPropertyItem *pParentProp, const SSymbolInfo &symbol, const int depth );
+	void		MakeProperty_Pointer(wxPGProperty *pParentProp, const SSymbolInfo &symbol, const int depth );
 
-	void		MakeProperty_Data(CPropertyItem *pParentProp, const SSymbolInfo &symbol, const int depth );
+	void		MakeProperty_Data(wxPGProperty *pParentProp, const SSymbolInfo &symbol, const int depth );
 
-	void		MakeProperty_Array(CPropertyItem *pParentProp, const SSymbolInfo &symbol, const int depth );
+	void		MakeProperty_Array(wxPGProperty *pParentProp, const SSymbolInfo &symbol, const int depth );
 
-	CPropertyItem* MakeProperty_BaseType(CPropertyItem *pParentProp, 
+	wxPGProperty* MakeProperty_BaseType(wxPGProperty *pParentProp, 
 		const std::string valueName,  const SSymbolInfo &symbol );
 
-	CPropertyItem* MakeProperty_PointerData(CPropertyItem *pParentProp, 
+	wxPGProperty* MakeProperty_PointerData(wxPGProperty *pParentProp, 
 		const SSymbolInfo &symbol );
 
- 	CPropertyItem* MakeProperty_ArrayData(CPropertyItem *pParentProp, 
+ 	wxPGProperty* MakeProperty_ArrayData(wxPGProperty *pParentProp, 
  		const SSymbolInfo &symbol );
 
-	CPropertyItem* MakeProperty_UDTData(CPropertyItem *pParentProp, 
+	wxPGProperty* MakeProperty_UDTData(wxPGProperty *pParentProp, 
 		const SSymbolInfo &symbol );
 
-	CPropertyItem* MakeProperty_BaseClassData(CPropertyItem *pParentProp, 
+	wxPGProperty* MakeProperty_BaseClassData(wxPGProperty *pParentProp, 
 		const SSymbolInfo &symbol);
 
-	void		AddProperty(CPropertyItem *pParentProp, 
-		CPropertyItem *prop,  const SSymbolInfo *pSymbol, STypeData *pTypeData);
+	void		AddProperty(wxPGProperty *pParentProp, 
+		wxPGProperty *prop,  const SSymbolInfo *pSymbol, STypeData *pTypeData);
 
 	_variant_t GetValue(IDiaSymbol *pSymbol, void *pMemPtr);
 
@@ -86,7 +86,7 @@ bool visualizer::MakeProperty_DefaultForm( CPropertyWindow *pProperties,  const 
 // 
 //------------------------------------------------------------------------
 bool visualizer::MakeProperty_DefaultForm(  CPropertyWindow *pProperties, 
-								 CPropertyItem *pParentProp,  const string &symbolName )
+								 wxPGProperty *pParentProp,  const string &symbolName )
 {
 
 	return true;
@@ -97,11 +97,11 @@ bool visualizer::MakeProperty_DefaultForm(  CPropertyWindow *pProperties,
 // 
 //------------------------------------------------------------------------
 bool visualizer::MakeProperty_DefaultForm(  CPropertyWindow *pProperties,
-				CPropertyItem *pParentProp,  
+				wxPGProperty *pParentProp,  
 				 const SSymbolInfo &symbol )
 {
 	g_pProperty = pProperties;
-	MakeProperty_Root(pParentProp, symbol, 2);
+	MakeProperty_Root(pParentProp, symbol, 20);
 	return true;
 }
 
@@ -110,12 +110,12 @@ bool visualizer::MakeProperty_DefaultForm(  CPropertyWindow *pProperties,
 //  symbol.pSym 의 자식을 pParentProp에 추가한다.
 //------------------------------------------------------------------------
 bool	 visualizer::MakePropertyChild_DefaultForm(  CPropertyWindow *pProperties, 
-												   CPropertyItem *pParentProp,  const SSymbolInfo &symbol)
+												   wxPGProperty *pParentProp,  const SSymbolInfo &symbol)
 {
 	g_pProperty = pProperties;
 	const bool isVisualizerType = visualizer::MakeVisualizerProperty( pProperties, pParentProp, symbol );
 	if (!isVisualizerType)
-		MakeProperty_Child(pParentProp, symbol, 2);
+		MakeProperty_Child(pParentProp, symbol, 20);
 	return true;
 }
 
@@ -123,7 +123,7 @@ bool	 visualizer::MakePropertyChild_DefaultForm(  CPropertyWindow *pProperties,
 //------------------------------------------------------------------------
 //  symbol을 pParentProp의 자식으로 추가한다.
 //------------------------------------------------------------------------
-bool	 visualizer::MakeProperty_Child(  CPropertyItem *pParentProp,  
+bool	 visualizer::MakeProperty_Child(  wxPGProperty *pParentProp,  
 									   const SSymbolInfo &symbol, const int depth )
 {
 	if (depth <= 0)
@@ -172,7 +172,7 @@ bool	 visualizer::MakeProperty_Child(  CPropertyItem *pParentProp,
 //------------------------------------------------------------------------
 // Property 생성
 //------------------------------------------------------------------------
-void visualizer::MakeProperty_Root(CPropertyItem *pParentProp, const SSymbolInfo &symbol, 
+void visualizer::MakeProperty_Root(wxPGProperty *pParentProp, const SSymbolInfo &symbol, 
 								   const int depth )
 {
 	if (depth <= 0)
@@ -181,7 +181,7 @@ void visualizer::MakeProperty_Root(CPropertyItem *pParentProp, const SSymbolInfo
 	if (S_OK != symbol.pSym->get_symTag((DWORD*)&symtag))
 		return;
 
-	CPropertyItem *pProp = NULL;
+	wxPGProperty *pProp = NULL;
 	switch (symtag)
 	{
 	case SymTagData: 
@@ -223,7 +223,7 @@ void visualizer::MakeProperty_Root(CPropertyItem *pParentProp, const SSymbolInfo
 //------------------------------------------------------------------------
 // 기본 클래스 
 //------------------------------------------------------------------------
-void	visualizer ::MakeProperty_BaseClass(CPropertyItem *pParentProp, 
+void	visualizer ::MakeProperty_BaseClass(wxPGProperty *pParentProp, 
 											const SSymbolInfo &symbol, const int depth )
 {
 	IDiaSymbol* pBaseType;
@@ -240,21 +240,19 @@ void	visualizer ::MakeProperty_BaseClass(CPropertyItem *pParentProp,
 //------------------------------------------------------------------------
 // baseclass type preview
 //------------------------------------------------------------------------
-CPropertyItem* visualizer::MakeProperty_BaseClassData(
-	CPropertyItem *pParentProp, const SSymbolInfo &symbol)
+wxPGProperty* visualizer::MakeProperty_BaseClassData(
+	wxPGProperty *pParentProp, const SSymbolInfo &symbol)
 {
-	CPropertyItem *pProp = new CPropertyItem( symbol.mem.name );
-	//pProp->SetValue( wxVariant(symbol.mem.name, symbol.mem.name) );
-
-	AddProperty(pParentProp, pProp, &symbol, &STypeData(SymTagBaseClass, VT_EMPTY, NULL));
-	return pProp;
+	CPropertyItemAdaptor prop( symbol.mem.name );
+	AddProperty(pParentProp, prop.GetProperty(), &symbol, &STypeData(SymTagBaseClass, VT_EMPTY, NULL));
+	return prop.GetProperty();
 }
 
 
 //------------------------------------------------------------------------
 // User Define Type 
 //------------------------------------------------------------------------
-void visualizer ::MakeProperty_UDTChild(CPropertyItem *pParentProp, 
+void visualizer ::MakeProperty_UDTChild(wxPGProperty *pParentProp, 
 										const SSymbolInfo &symbol, const int depth)
 {
 	RET (!pParentProp);
@@ -284,7 +282,7 @@ void visualizer ::MakeProperty_UDTChild(CPropertyItem *pParentProp,
 //------------------------------------------------------------------------
 // Pointer 타입 출력 
 //------------------------------------------------------------------------
-void	visualizer ::MakeProperty_Pointer(CPropertyItem *pParentProp, const SSymbolInfo &symbol,
+void	visualizer ::MakeProperty_Pointer(wxPGProperty *pParentProp, const SSymbolInfo &symbol,
 										  const int depth)
 {
 	IDiaSymbol* pBaseType;
@@ -297,7 +295,7 @@ void	visualizer ::MakeProperty_Pointer(CPropertyItem *pParentProp, const SSymbol
 	void *srcPtr = (void*)*(DWORD*)symbol.mem.ptr;
 	void *newPtr = sharedmemory::MemoryMapping(srcPtr);
 
-	CPropertyItem *pProp = NULL;
+	wxPGProperty *pProp = NULL;
 	if (SymTagUDT == baseSymTag)
 	{
 		if (newPtr) 
@@ -314,7 +312,7 @@ void	visualizer ::MakeProperty_Pointer(CPropertyItem *pParentProp, const SSymbol
 // Property창에 Control을 추가한다.
 // 변수 이름과 타입, 값을 설정한다.
 //------------------------------------------------------------------------
-void visualizer ::MakeProperty_Data(CPropertyItem *pParentProp, const SSymbolInfo &symbol,
+void visualizer ::MakeProperty_Data(wxPGProperty *pParentProp, const SSymbolInfo &symbol,
 									const int depth)
 {
 	IDiaSymbol* pBaseType;
@@ -325,7 +323,7 @@ void visualizer ::MakeProperty_Data(CPropertyItem *pParentProp, const SSymbolInf
 	hr = pBaseType->get_symTag((DWORD*)&baseSymTag);
 	ASSERT_RET(hr == S_OK);
 
-	CPropertyItem *pProp;
+	wxPGProperty *pPgProp = NULL;
 	switch (baseSymTag)
 	{
 	case SymTagBaseType:
@@ -339,50 +337,47 @@ void visualizer ::MakeProperty_Data(CPropertyItem *pParentProp, const SSymbolInf
 		{
 			std::string typeName = dia::GetSymbolTypeName(pBaseType);
 			std::string valueTypeName =  symbol.mem.name + " (" +  typeName + ")";
-			//pProp = new CPropertyGrid( valueTypeName, _T(" ") ); 
-			pProp = new CPropertyItem( valueTypeName ); 
-			//pProp->SetValue( wxVariant(valueTypeName, valueTypeName) );
 
-			AddProperty(pParentProp, pProp, &symbol, &STypeData(baseSymTag, VT_UI4, symbol.mem.ptr));
+			CPropertyItemAdaptor prop( valueTypeName,  CPropertyItemAdaptor::PROPTYPE_ENUM ); 
+			AddProperty(pParentProp, prop.GetProperty(), &symbol, &STypeData(baseSymTag, VT_UI4, symbol.mem.ptr));
 
 			CComPtr<IDiaEnumSymbols> pEnumChildren;
 			IDiaSymbol *pChild;
 			if (SUCCEEDED(pBaseType->findChildren(SymTagNull, NULL, nsNone, &pEnumChildren))) 
 			{
+				//int enum_v = 0;
 				ULONG celt = 0;
 				while (SUCCEEDED(pEnumChildren->Next(1, &pChild, &celt)) && (celt == 1)) 
 				{
 					std::string e_name = dia::GetSymbolName(pChild);
-					//pProp->AddOption( common::str2wstr(e_name).c_str() );
+					prop.AddChoice(e_name);
 					pChild->Release();
 				}
 			}
-			//pProp->AllowEdit(FALSE);
-			pProp->SetModifiedStatus(false);
 
 			ULONGLONG length = 0;
 			HRESULT hr = pBaseType->get_length(&length);
 			_variant_t value = dia::GetValueFromAddress( symbol.mem.ptr, btUInt, length );
-			SetPropertyValue( pProp, value);
+			prop.SetValue( value.intVal );
 		}
 		break;
 
 	case SymTagUDT:
-		pProp = MakeProperty_UDTData(pParentProp, symbol);
-		if (pProp)
-			MakeProperty_Child(pProp, SSymbolInfo(pBaseType, symbol.mem), depth-1);
+		pPgProp = MakeProperty_UDTData(pParentProp, symbol);
+		if (pPgProp)
+			MakeProperty_Child(pPgProp, SSymbolInfo(pBaseType, symbol.mem), depth-1);
 		break;
 
 	case SymTagArrayType:
-		pProp = MakeProperty_ArrayData(pParentProp, symbol);
-		if (pProp)
-			MakeProperty_Child(pProp, SSymbolInfo(pBaseType, symbol.mem), depth-1);
+		pPgProp = MakeProperty_ArrayData(pParentProp, symbol);
+		if (pPgProp)
+			MakeProperty_Child(pPgProp, SSymbolInfo(pBaseType, symbol.mem), depth-1);
 		break;
 
 	case SymTagPointerType:
-		pProp = MakeProperty_PointerData(pParentProp, symbol);
-		if (pProp)
-			MakeProperty_Child(pProp, SSymbolInfo(pBaseType, symbol.mem), depth-1);
+		pPgProp = MakeProperty_PointerData(pParentProp, symbol);
+		if (pPgProp)
+			MakeProperty_Child(pPgProp, SSymbolInfo(pBaseType, symbol.mem), depth-1);
 		break;
 
 	default:
@@ -395,10 +390,10 @@ void visualizer ::MakeProperty_Data(CPropertyItem *pParentProp, const SSymbolInf
 //------------------------------------------------------------------------
 // Pointer type Preview
 //------------------------------------------------------------------------
-CPropertyItem* visualizer::MakeProperty_ArrayData(CPropertyItem *pParentProp, 
+wxPGProperty* visualizer::MakeProperty_ArrayData(wxPGProperty *pParentProp, 
 												 const SSymbolInfo &symbol )
 {
-	CPropertyItem *pProp = NULL;
+	wxPGProperty *pProp = NULL;
 
 	CComPtr<IDiaSymbol> pArrayType;
 	HRESULT hr = symbol.pSym->get_type(&pArrayType); // ArrayDataType
@@ -434,21 +429,21 @@ CPropertyItem* visualizer::MakeProperty_ArrayData(CPropertyItem *pParentProp,
 	}
 
 	//pProp = new CPropertyGrid( common::str2wstr(ss.str()).c_str() ); 
-	pProp = new CPropertyItem( ss.str() );
+	CPropertyItemAdaptor prop( ss.str() );
 	//pProp->SetValue( wxVariant(ss.str(), ss.str()) );
-	AddProperty(pParentProp, pProp, &symbol,  &STypeData(SymTagArrayType, VT_EMPTY, NULL) );
+	AddProperty(pParentProp, prop.GetProperty(), &symbol,  &STypeData(SymTagArrayType, VT_EMPTY, NULL) );
 
-	return pProp;
+	return prop.GetProperty();
 }
 
 
 //------------------------------------------------------------------------
 // Pointer Type Preview 
 //------------------------------------------------------------------------
-CPropertyItem* visualizer::MakeProperty_PointerData(
-	CPropertyItem *pParentProp, const SSymbolInfo &symbol )
+wxPGProperty* visualizer::MakeProperty_PointerData(
+	wxPGProperty *pParentProp, const SSymbolInfo &symbol )
 {
-	CPropertyItem *pProp = NULL;
+	wxPGProperty *pProp = NULL;
 
 	CComPtr<IDiaSymbol> pPointerType;
 	HRESULT hr = symbol.pSym->get_type(&pPointerType);
@@ -497,20 +492,18 @@ CPropertyItem* visualizer::MakeProperty_PointerData(
 		ss << " (" << typeName << ")";
 	}
 
-	//pProp = new CPropertyGrid( common::str2wstr(ss.str()).c_str() );
-	pProp = new CPropertyItem( ss.str() );
-	//pProp->SetValue( wxVariant(ss.str(), ss.str()) );
-	AddProperty( pParentProp, pProp, &symbol, &STypeData(SymTagPointerType, VT_EMPTY, NULL));
+	CPropertyItemAdaptor prop( ss.str() );
+	AddProperty( pParentProp, prop.GetProperty(), &symbol, &STypeData(SymTagPointerType, VT_EMPTY, NULL));
 
-	return pProp;
+	return prop.GetProperty();
 }
 
 
 //------------------------------------------------------------------------
 // UDT type Preview
 //------------------------------------------------------------------------
-CPropertyItem* visualizer::MakeProperty_UDTData(
-	CPropertyItem *pParentProp, const SSymbolInfo &symbol )
+wxPGProperty* visualizer::MakeProperty_UDTData(
+	wxPGProperty *pParentProp, const SSymbolInfo &symbol )
 {
 	const string typeName = dia::GetSymbolTypeName(symbol.pSym);
 
@@ -520,23 +513,20 @@ CPropertyItem* visualizer::MakeProperty_UDTData(
 	if (pParentProp)
 		ss << "  (" << typeName << ")";
 
-	CPropertyItem *pProp = 
-		//new CPropertyGrid( common::str2wstr(ss.str()).c_str() ); 
-		new CPropertyItem( ss.str() );
-	//pProp->SetValue( wxVariant(ss.str(), ss.str()) );
-	AddProperty(pParentProp, pProp, &symbol, &STypeData(SymTagUDT, VT_EMPTY, symbol.mem.ptr));
+	CPropertyItemAdaptor prop( ss.str() );
+	AddProperty(pParentProp, prop.GetProperty(), &symbol, &STypeData(SymTagUDT, VT_EMPTY, symbol.mem.ptr));
 	
 	const bool isVisualizerType = visualizer::MakeVisualizerProperty( g_pProperty, 
-		pProp, symbol.mem,  symbol.mem.name);
+		prop.GetProperty(), symbol.mem,  symbol.mem.name);
 	
-	return (isVisualizerType)? NULL : pProp;
+	return (isVisualizerType)? NULL : prop.GetProperty();
 }
 
 
 //------------------------------------------------------------------------
 // pSymbol : Array Type을 가리킨다. 
 //------------------------------------------------------------------------
-void visualizer ::MakeProperty_Array(CPropertyItem *pParentProp, const SSymbolInfo &symbol,
+void visualizer ::MakeProperty_Array(wxPGProperty *pParentProp, const SSymbolInfo &symbol,
 									 const int depth)
 {
 	ULONGLONG length=0;
@@ -584,13 +574,11 @@ void visualizer ::MakeProperty_Array(CPropertyItem *pParentProp, const SSymbolIn
 			SMemoryInfo arrayElem(valueName, ptr, (size_t)element_length);
 			SSymbolInfo arraySymbol(pElementType, arrayElem, false);
 
- 			CPropertyItem *pProp =
+ 			CPropertyItemAdaptor prop( valueName );
  		//		new CPropertyGrid( common::str2wstr(valueName).c_str() );
-				new CPropertyItem( valueName );
-			//pProp->SetValue( wxVariant(valueName, valueName) );
-			AddProperty( pParentProp, pProp, &arraySymbol, &STypeData(SymTagUDT,VT_EMPTY,NULL));
+			AddProperty( pParentProp, prop.GetProperty(), &arraySymbol, &STypeData(SymTagUDT,VT_EMPTY,NULL));
 
-			MakeProperty_Root(pProp, arraySymbol, depth);
+			MakeProperty_Root(prop.GetProperty(), arraySymbol, depth);
 		}
 		//pParentProp->Expand(FALSE); // 일단 접어놓는다.
 		pParentProp->SetExpanded(false);
@@ -603,87 +591,27 @@ void visualizer ::MakeProperty_Array(CPropertyItem *pParentProp, const SSymbolIn
 // m_wndPropList 에 Row 를 추가한다.
 // pSymbol 은 데이타를 가르키는 심볼이어야 한다.
 //------------------------------------------------------------------------
-CPropertyItem* visualizer ::MakeProperty_BaseType(
-	CPropertyItem *pParentProp, const std::string valueName, 
+wxPGProperty* visualizer ::MakeProperty_BaseType(
+	wxPGProperty *pParentProp, const std::string valueName, 
 	const SSymbolInfo &symbol )
 {
 	_variant_t value = dia::GetValueFromSymbol(symbol.mem.ptr, symbol.pSym);
 
-	// static 변수는 프로세스끼리 공유할 수없으므로 0으로 출력한다.
-	bool IsNotPrint = false;
-	LocationType locType;
-	dia::GetSymbolLocation(symbol.pSym, &locType);
-	if (LocIsStatic == locType)
-	{
-		value = 0;
-		IsNotPrint  = true;
-	}
-
-	CPropertyItem *pProp = NULL;
-	switch (value.vt)
-	{
-	case VT_I2:
-	case VT_I4:
-	case VT_R4:
-	case VT_R8:
-	case VT_BOOL:
-	case VT_DECIMAL:
-	case VT_UI2:
-	case VT_UI4:
-	case VT_INT:
-	case VT_UINT:
-		{
-			pProp = new CPropertyItem( valueName );
-				//common::str2wstr(valueName).c_str());
-			//pProp->SetVariantValue( value );
-
-			_variant_t v1 = pProp->GetVariantValue();
-			//ASSERT(v1.vt == value.vt);
-		}
-		break;
-
-	case VT_I1:
-	case VT_UI1:
-		pProp = new CPropertyItem( valueName ); 
-		//	(_variant_t)(int)0, _T("") );
-		//pProp->SetVariantValue( value ); // TEST CODE
-		break;
-
-	default:
-		{
-		}
-		break;
-	}
-	RETV(!pProp, NULL);
-
-	if (!SetPropertyValue(pProp, value ))
-	{
-		delete pProp;
+	CPropertyItemAdaptor prop;
+	if (!prop.Init( valueName, symbol, value ))
 		return NULL;
- 	}
 
-	if (IsNotPrint)
-	{
-		// 화면에 출력되지 않는 값은 메모리주소를 NULL로 설정해서
-		// Refresh 되지 않게 한다.
-		pProp->Enable(false);
- 		//pProp->AllowEdit(FALSE);
- 		//pProp->Enable(FALSE);
-		AddProperty(pParentProp, pProp, &symbol, &STypeData(SymTagData, VT_EMPTY, NULL));
-	}
-	else
-	{
- 		AddProperty(pParentProp, pProp, &symbol, &STypeData(SymTagData, value.vt, symbol.mem.ptr));
-	}
+	AddProperty(pParentProp, prop.GetProperty(), &symbol, 
+		&STypeData(SymTagData, value.vt, symbol.mem.ptr));
 
-	return pProp;
+	return prop.GetProperty();
 }
 
 
 //------------------------------------------------------------------------
 // Property 데이타에 value 값을 설정한다. 
 //------------------------------------------------------------------------
-bool visualizer ::SetPropertyValue(CPropertyItem *pProp, _variant_t value)
+bool visualizer ::SetPropertyValue(wxPGProperty *pProp, _variant_t value)
 {
 	switch (value.vt)
 	{
@@ -755,8 +683,8 @@ bool visualizer ::SetPropertyValue(CPropertyItem *pProp, _variant_t value)
 // Property추가
 //------------------------------------------------------------------------
 void visualizer ::AddProperty(
-								 CPropertyItem *pParentProp, 
-								 CPropertyItem *prop, 
+								 wxPGProperty *pParentProp, 
+								 wxPGProperty *prop, 
 								 const SSymbolInfo *pSymbol,
 								 STypeData *typeData)
 {

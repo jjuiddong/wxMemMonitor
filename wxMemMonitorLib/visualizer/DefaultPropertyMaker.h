@@ -13,25 +13,26 @@
 namespace memmonitor 
 {
 	class CPropertyWindow; 
-	class CPropertyItem;
+	class CPropertyItemAdaptor;
 }
 
+class wxPGProperty;
 namespace visualizer
 {
 	using namespace memmonitor;
 
 	bool		MakeProperty_DefaultForm( CPropertyWindow *pProperties,  const std::string &symbolName );
 
-	bool		MakeProperty_DefaultForm( CPropertyWindow *pProperties, CPropertyItem *pParentProp,  
+	bool		MakeProperty_DefaultForm( CPropertyWindow *pProperties, wxPGProperty *pParentProp,  
 		const std::string &symbolName );
 
-	bool		MakeProperty_DefaultForm(  CPropertyWindow *pProperties, CPropertyItem *pParentProp,  
+	bool		MakeProperty_DefaultForm(  CPropertyWindow *pProperties, wxPGProperty *pParentProp,  
 		const SSymbolInfo &symbol );
 
-	bool		MakePropertyChild_DefaultForm(  CPropertyWindow *pProperties, CPropertyItem *pParentProp,  
+	bool		MakePropertyChild_DefaultForm(  CPropertyWindow *pProperties, wxPGProperty *pParentProp,  
 		const SSymbolInfo &symbol );
 
-	bool		SetPropertyValue(CPropertyItem *pProp, _variant_t value);
+	bool		SetPropertyValue(wxPGProperty*pProp, _variant_t value);
 
 }
 
