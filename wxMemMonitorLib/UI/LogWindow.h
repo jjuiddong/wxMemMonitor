@@ -15,6 +15,8 @@ namespace memmonitor
 		CLogWindow(wxWindow *parent);
 		virtual ~CLogWindow() {}
 
+		void PrintText( const wxString &msg );
+
 	protected:
 
 	};

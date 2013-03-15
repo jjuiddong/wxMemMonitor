@@ -3,7 +3,7 @@
 // Author:  jjuiddong
 // Date:    1/29/2013
 // 
-// 
+// make property attribute with visualizer autoexp.txt script
 //------------------------------------------------------------------------
 #ifndef __VISUALIZERPROPERTYMAKER_H__
 #define __VISUALIZERPROPERTYMAKER_H__
@@ -11,10 +11,9 @@
 #include "VisualizerDefine.h"
 #include "VisualizerGlobal.h"
 
-namespace memmonitor 
-{ 
+namespace memmonitor { 
 	class CPropertyWindow; 
-	class CPropertyItemAdaptor;
+	class CPropertyItemAdapter;
 }
 
 struct IDiaSymbol;

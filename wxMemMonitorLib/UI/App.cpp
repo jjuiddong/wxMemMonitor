@@ -1,16 +1,29 @@
 
 #include "stdafx.h"
 #include "../wxMemMonitor.h"
+#include "../Control/Global.h"
 #include "Frame.h"
+#include <Shellapi.h>
 
 using namespace memmonitor;
 
-
 bool CApp::OnInit()
 {
-	if ( !wxApp::OnInit() )
-		return false;
 	SetExitOnFrameDelete(true);
+
+	//get Cofig File Name from Command Line
+	std::string configFileName = GetConfigFileName();
+	if (configFileName.empty())
+	{
+		int nArgs;
+		LPWSTR *szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
+		if (nArgs > 1)
+		{
+			configFileName = common::wstr2str(szArglist[ 1]);
+			SetConfigFileName( configFileName );
+		}
+	}
+	//
 
 	wxFrame* frame = new CFrame(NULL);
 	SetTopWindow(frame);

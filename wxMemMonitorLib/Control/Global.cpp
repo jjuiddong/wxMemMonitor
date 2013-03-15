@@ -6,8 +6,9 @@
 
 namespace memmonitor
 {
-	EXECUTE_TYPE g_Type;
+	EXECUTE_TYPE g_Type = OUTER_PROCESS;
 	std::string g_ErrorMsg;
+	std::string g_ConfigFileName;
 }
 
 using namespace memmonitor;
@@ -29,6 +30,15 @@ void	memmonitor::SetErrorMsg(const std::string&msg)
 {
 	g_ErrorMsg = msg;
 }
+const std::string& memmonitor::GetConfigFileName()
+{
+	return g_ConfigFileName;
+}
+void memmonitor::SetConfigFileName(const std::string &fileName)
+{
+	g_ConfigFileName = fileName;
+}
+
 
 MemTreePtr memmonitor::GetMemoryTree()
 {
@@ -48,6 +58,11 @@ PropWindowPtr memmonitor::GetPropertyWindow()
 	RETV(!pFrame, NULL);
 	return pFrame->GetPropWindow();
 }
+FramePtr memmonitor::GetFrame()
+{
+	CFrame *pFrame = static_cast<CFrame*>(wxTheApp->GetTopWindow());
+	return pFrame;
+}
 
 
 //------------------------------------------------------------------------
@@ -60,6 +75,7 @@ wxVariant memmonitor::Variant2wxVariant(const _variant_t &var)
 	wxVariant wxVar;
 	switch (var.vt)
 	{
+	case VT_I1: wxVar = (long)var.cVal; break;
 	case VT_I2: wxVar = wxVariant(var.iVal); break;
 	case VT_I4: wxVar = wxVariant(var.lVal); break;
 	case VT_R4: wxVar = wxVariant(var.fltVal); break;
@@ -67,7 +83,7 @@ wxVariant memmonitor::Variant2wxVariant(const _variant_t &var)
 
 	case VT_BOOL: wxVar = wxVariant(var.bVal); break;
 	case VT_DECIMAL: break;
-	case VT_I1: wxVar = wxVariant(var.cVal); break;
+
 	case VT_UI1: wxVar = wxVariant(var.bVal); break;
 	case VT_UI2: wxVar = wxVariant(var.uiVal); break;
 	case VT_UI4: wxVar = wxVariant((int)var.ulVal); break;

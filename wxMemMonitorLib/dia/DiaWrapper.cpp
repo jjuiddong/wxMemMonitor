@@ -87,6 +87,8 @@ bool CDiaWrapper::Init(const string &pdbFileName)
 //------------------------------------------------------------------------
 IDiaSymbol* CDiaWrapper::FindType(const std::string &typeName)
 {
+	RETV(!m_pGlobalSymbol, NULL);
+
 	CComPtr<IDiaEnumSymbols> pEnumSymbols;
 	if (FAILED(m_pGlobalSymbol->findChildren(SymTagNull, common::str2wstr(typeName).c_str(), 
 		nsRegularExpression, &pEnumSymbols))) 

@@ -26,7 +26,10 @@ namespace memmonitor
 	MemTreePtr				GetMemoryTree();
 	LogWindowPtr			GetLogWindow();
 	PropWindowPtr		GetPropertyWindow();
+	FramePtr					GetFrame();
 
+	const std::string&	GetConfigFileName();
+	void							SetConfigFileName(const std::string &fileName);
 	const std::string&	GetErrorMsg();
 	void							SetErrorMsg(const std::string&msg);
 

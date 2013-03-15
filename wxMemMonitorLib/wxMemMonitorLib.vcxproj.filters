@@ -69,7 +69,7 @@
     <ClInclude Include="Control\Global.h">
       <Filter>Src\Control</Filter>
     </ClInclude>
-    <ClInclude Include="UI\PropertyItemAdaptor.h">
+    <ClInclude Include="UI\PropertyItemAdapter.h">
       <Filter>Src\ui</Filter>
     </ClInclude>
   </ItemGroup>
@@ -119,7 +119,7 @@
     <ClCompile Include="Control\Global.cpp">
       <Filter>Src\Control</Filter>
     </ClCompile>
-    <ClCompile Include="UI\PropertyItemAdaptor.cpp">
+    <ClCompile Include="UI\PropertyItemAdapter.cpp">
       <Filter>Src\ui</Filter>
     </ClCompile>
   </ItemGroup>

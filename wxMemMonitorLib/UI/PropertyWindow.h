@@ -3,14 +3,13 @@
 // Author:  jjuiddong
 // Date:    3/10/2013
 // 
-// 
+// show memory data
 //------------------------------------------------------------------------
 #pragma once
 #include <wx/propgrid/manager.h>
 #include "../Control/Global.h"
 
-namespace visualizer
-{
+namespace visualizer {
 	struct SSymbolInfo;
 }
 
@@ -18,6 +17,12 @@ namespace memmonitor
 {
 	class CPropertyWindow : public wxPropertyGridManager
 	{
+		enum  {
+			MENU_OPEN_PROPERTY,
+			ID_REFRESH_TIMER,
+			REFRESH_INTERVAL = 1000,
+		};
+
 		struct SPropItem
 		{
 			//wxPGProperty *prop;
@@ -36,13 +41,22 @@ namespace memmonitor
 			const visualizer::SSymbolInfo *pSymbol, STypeData *pTypeData);
 
 	protected:
+		void CheckSymbol( const wxString &symbolName );
+		bool	FindSymbolUpward( wxPGProperty *pProp, OUT visualizer::SSymbolInfo *pOut );
+		void	RefreshPropertyItem( wxPGProperty *pProp );
 		void ClearPropItem();
 
 		// Event Handler
+		DECLARE_EVENT_TABLE()
 		void OnPropertyGridChange( wxPropertyGridEvent& event );
+		void OnPropertyGridSelect( wxPropertyGridEvent& event );
+		void OnContextMenu(wxContextMenuEvent& event);
+		void OnMenuOpenProperty(wxCommandEvent& event);
+		void OnRefreshTimer(wxTimerEvent& event);
 
 	protected:
 		wxString	m_CurrentSymbolName;
+		wxTimer	m_Timer;
 		PropList	m_PropList;
 
 	};

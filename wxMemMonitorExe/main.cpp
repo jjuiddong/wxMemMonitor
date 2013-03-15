@@ -1,4 +1,15 @@
 
+//#include "stdafx.h"
+
+#ifdef wxUSE_CMDLINE_PARSER
+#undef wxUSE_CMDLINE_PARSER
+#endif
+#include "../wxMemMonitorLib/wxMemMonitor.h"
+MEMORYMONITOR_OUTER_PROCESS();
+
+
+
+/*
 #include "wx/wxprec.h"
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
@@ -7,6 +18,7 @@
 #include "wx/treectrl.h"
 #include <wx/aui/aui.h>
 
+/*
 class MyFrame : public wxFrame 
 {
 public:
@@ -64,3 +76,4 @@ public:
 
 DECLARE_APP(MyApp);
 IMPLEMENT_APP(MyApp);
+/**/

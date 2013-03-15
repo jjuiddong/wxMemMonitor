@@ -4,9 +4,8 @@
 #include "PropertyMaker.h"
 #include "../dia/DiaWrapper.h"
 #include "../ui/PropertyWindow.h"
-#include "../ui/PropertyItemAdaptor.h"
+#include "../ui/PropertyItemAdapter.h"
 #include "VisualizerDefine.h"
-#include <atlbase.h>
 
 
 namespace visualizer
@@ -101,7 +100,7 @@ bool visualizer::MakeProperty_DefaultForm(  CPropertyWindow *pProperties,
 				 const SSymbolInfo &symbol )
 {
 	g_pProperty = pProperties;
-	MakeProperty_Root(pParentProp, symbol, 20);
+	MakeProperty_Root(pParentProp, symbol, 2);
 	return true;
 }
 
@@ -115,7 +114,7 @@ bool	 visualizer::MakePropertyChild_DefaultForm(  CPropertyWindow *pProperties,
 	g_pProperty = pProperties;
 	const bool isVisualizerType = visualizer::MakeVisualizerProperty( pProperties, pParentProp, symbol );
 	if (!isVisualizerType)
-		MakeProperty_Child(pParentProp, symbol, 20);
+		MakeProperty_Child(pParentProp, symbol, 2);
 	return true;
 }
 
@@ -243,7 +242,7 @@ void	visualizer ::MakeProperty_BaseClass(wxPGProperty *pParentProp,
 wxPGProperty* visualizer::MakeProperty_BaseClassData(
 	wxPGProperty *pParentProp, const SSymbolInfo &symbol)
 {
-	CPropertyItemAdaptor prop( symbol.mem.name );
+	CPropertyItemAdapter prop( symbol.mem.name );
 	AddProperty(pParentProp, prop.GetProperty(), &symbol, &STypeData(SymTagBaseClass, VT_EMPTY, NULL));
 	return prop.GetProperty();
 }
@@ -338,7 +337,7 @@ void visualizer ::MakeProperty_Data(wxPGProperty *pParentProp, const SSymbolInfo
 			std::string typeName = dia::GetSymbolTypeName(pBaseType);
 			std::string valueTypeName =  symbol.mem.name + " (" +  typeName + ")";
 
-			CPropertyItemAdaptor prop( valueTypeName,  CPropertyItemAdaptor::PROPTYPE_ENUM ); 
+			CPropertyItemAdapter prop( valueTypeName,  CPropertyItemAdapter::PROPTYPE_ENUM ); 
 			AddProperty(pParentProp, prop.GetProperty(), &symbol, &STypeData(baseSymTag, VT_UI4, symbol.mem.ptr));
 
 			CComPtr<IDiaEnumSymbols> pEnumChildren;
@@ -429,7 +428,7 @@ wxPGProperty* visualizer::MakeProperty_ArrayData(wxPGProperty *pParentProp,
 	}
 
 	//pProp = new CPropertyGrid( common::str2wstr(ss.str()).c_str() ); 
-	CPropertyItemAdaptor prop( ss.str() );
+	CPropertyItemAdapter prop( ss.str() );
 	//pProp->SetValue( wxVariant(ss.str(), ss.str()) );
 	AddProperty(pParentProp, prop.GetProperty(), &symbol,  &STypeData(SymTagArrayType, VT_EMPTY, NULL) );
 
@@ -492,7 +491,7 @@ wxPGProperty* visualizer::MakeProperty_PointerData(
 		ss << " (" << typeName << ")";
 	}
 
-	CPropertyItemAdaptor prop( ss.str() );
+	CPropertyItemAdapter prop( ss.str() );
 	AddProperty( pParentProp, prop.GetProperty(), &symbol, &STypeData(SymTagPointerType, VT_EMPTY, NULL));
 
 	return prop.GetProperty();
@@ -513,9 +512,9 @@ wxPGProperty* visualizer::MakeProperty_UDTData(
 	if (pParentProp)
 		ss << "  (" << typeName << ")";
 
-	CPropertyItemAdaptor prop( ss.str() );
+	CPropertyItemAdapter prop( ss.str());//,  CPropertyItemAdaptor::PROPERTY_PARENT);
 	AddProperty(pParentProp, prop.GetProperty(), &symbol, &STypeData(SymTagUDT, VT_EMPTY, symbol.mem.ptr));
-	
+
 	const bool isVisualizerType = visualizer::MakeVisualizerProperty( g_pProperty, 
 		prop.GetProperty(), symbol.mem,  symbol.mem.name);
 	
@@ -574,7 +573,7 @@ void visualizer ::MakeProperty_Array(wxPGProperty *pParentProp, const SSymbolInf
 			SMemoryInfo arrayElem(valueName, ptr, (size_t)element_length);
 			SSymbolInfo arraySymbol(pElementType, arrayElem, false);
 
- 			CPropertyItemAdaptor prop( valueName );
+ 			CPropertyItemAdapter prop( valueName );
  		//		new CPropertyGrid( common::str2wstr(valueName).c_str() );
 			AddProperty( pParentProp, prop.GetProperty(), &arraySymbol, &STypeData(SymTagUDT,VT_EMPTY,NULL));
 
@@ -597,85 +596,11 @@ wxPGProperty* visualizer ::MakeProperty_BaseType(
 {
 	_variant_t value = dia::GetValueFromSymbol(symbol.mem.ptr, symbol.pSym);
 
-	CPropertyItemAdaptor prop;
-	if (!prop.Init( valueName, symbol, value ))
-		return NULL;
-
+	CPropertyItemAdapter prop( valueName, symbol, value );
 	AddProperty(pParentProp, prop.GetProperty(), &symbol, 
-		&STypeData(SymTagData, value.vt, symbol.mem.ptr));
+		&STypeData(SymTagData, (prop.IsEnabled()? value.vt : VT_EMPTY), symbol.mem.ptr));
 
 	return prop.GetProperty();
-}
-
-
-//------------------------------------------------------------------------
-// Property 데이타에 value 값을 설정한다. 
-//------------------------------------------------------------------------
-bool visualizer ::SetPropertyValue(wxPGProperty *pProp, _variant_t value)
-{
-	switch (value.vt)
-	{
-	case VT_I2:
-	case VT_I4:
-	case VT_R4:
-	case VT_R8:
-	case VT_BOOL:
-	case VT_DECIMAL:
-	case VT_UI2:
-	case VT_UI4:
-	case VT_INT:
-	case VT_UINT:
-	case VT_I1:
-	case VT_UI1:
-		{
-			//const size_t optionCnt = pProp->GetOptionCount();
-			//if (optionCnt > 0)
-			//{
-			//	//ASSERT_RETV((int)value < optionCnt, false);
-			//	if ((size_t)value < optionCnt)
-			//	{
-			//		_variant_t var = (_variant_t)pProp->GetOption( (int)value );
-			//		pProp->SetValue(var);
-			//	}
-			//}
-			//else
-			//{
-			//	_variant_t var;
-			//	var.ChangeType(pProp->GetValue().vt, &value);
-			//	pProp->SetValue(var);
-			//}
-		}
-		break;
-
-		//		{
-		//			_variant_t tmp  = (VT_I1 == value.vt)? (int)value.cVal : (int)value.bVal;
-		// 			_variant_t var;
-		// 			var.ChangeType(pProp->GetValue().vt, &value);
-		// 			pProp->SetValue(tmp);
-		//  		}
-		//  		break;
-
-		// 	case VT_BSTR:
-		// 		{
-		// 			std::string str;
-		// 			operator>>(str);
-		// #ifdef _UNICODE
-		// 			var.bstrVal = (_bstr_t)common::string2wstring(str).c_str();
-		// #else
-		// 			var.bstrVal = (_bstr_t)str.c_str();
-		// #endif
-		// 		}
-		// 		break;
-
-	default:
-		{
-			// Err!!, Property에 value 타입의 값을 넣을 수 없습니다. 
-			ASSERT(0);
-			return false;
-		}
-		break;
-	}
-	return true;
 }
 
 

@@ -17,9 +17,15 @@ namespace memmonitor
 		CFrame(wxWindow* parent);
 		virtual ~CFrame();
 
+		bool AddPropertyWindow(const wxString &symbolName );
+
 		MemTreePtr GetMemTree() const;
 		LogWindowPtr GetLogWindow() const;
 		PropWindowPtr GetPropWindow() const;
+
+	protected:
+		bool	InitMemoryMonitor(const std::string &configFileName);
+		bool LoadConfigFile(const std::string &fileName);
 		
 	private:
 		wxAuiManager m_mgr;

@@ -44,7 +44,7 @@ namespace memmonitor
 	// Error Report
 	const std::string& GetLastError();
 
-
+	// App
 	class CApp : public wxApp
 	{
 	public:

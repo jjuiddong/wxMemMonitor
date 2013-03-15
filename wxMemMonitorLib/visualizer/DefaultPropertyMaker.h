@@ -13,7 +13,7 @@
 namespace memmonitor 
 {
 	class CPropertyWindow; 
-	class CPropertyItemAdaptor;
+	class CPropertyItemAdapter;
 }
 
 class wxPGProperty;
@@ -31,8 +31,6 @@ namespace visualizer
 
 	bool		MakePropertyChild_DefaultForm(  CPropertyWindow *pProperties, wxPGProperty *pParentProp,  
 		const SSymbolInfo &symbol );
-
-	bool		SetPropertyValue(wxPGProperty*pProp, _variant_t value);
 
 }
 

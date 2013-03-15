@@ -1,27 +1,32 @@
 
 #include "stdafx.h"
-#include "PropertyItemAdaptor.h"
+#include "PropertyItemAdapter.h"
 #include "../dia/DiaWrapper.h"
 #include <wx/propgrid/property.h>
 #include <wx/propgrid/advprops.h>
+#include "../Control/Global.h"
 
 using namespace memmonitor;
 
-CPropertyItemAdaptor::CPropertyItemAdaptor() :
+CPropertyItemAdapter::CPropertyItemAdapter() :
 	m_pProperty(NULL)
 {
 }
 
-CPropertyItemAdaptor::CPropertyItemAdaptor( std::string label,  PROPERTY_TYPE type ) :
+CPropertyItemAdapter::CPropertyItemAdapter( std::string label,  PROPERTY_TYPE type ) :
 	m_pProperty(NULL)
 {
 	switch (type)
 	{
 	case PROPERTY_STRING:
-		m_pProperty = new wxStringProperty(label, wxPG_LABEL, "<composed>" );	
+		m_pProperty = new wxStringProperty(label, wxPG_LABEL, "<composed>" );
 		break;
+	//case PROPERTY_PARENT:
+	//	m_pProperty = new wxStringProperty(label, wxPG_LABEL, "<composed>" );
+	//	m_pProperty->ChangeFlag( wxPG_PROP_MISC_PARENT , true );
+	//	break;
 	case PROPTYPE_CATEGORY:
-		m_pProperty = new wxPropertyCategory(label, wxPG_LABEL );	
+		m_pProperty = new wxPropertyCategory(label, wxPG_LABEL );
 		break;
 	case PROPTYPE_ENUM:
 		m_pProperty = new wxEnumProperty(label, wxPG_LABEL );	
@@ -29,13 +34,19 @@ CPropertyItemAdaptor::CPropertyItemAdaptor( std::string label,  PROPERTY_TYPE ty
 	}
 }
 
-CPropertyItemAdaptor::CPropertyItemAdaptor(wxPGProperty *pProperty) :
+CPropertyItemAdapter::CPropertyItemAdapter(wxPGProperty *pProperty) :
 	m_pProperty(pProperty)
 {
 
 }
 
-CPropertyItemAdaptor::~CPropertyItemAdaptor()
+CPropertyItemAdapter::CPropertyItemAdapter( const std::string &valueName, 
+	const visualizer::SSymbolInfo &symbol, _variant_t value )
+{
+	CreateProperty(valueName, symbol, value );
+}
+
+CPropertyItemAdapter::~CPropertyItemAdapter()
 {
 }
 
@@ -43,7 +54,7 @@ CPropertyItemAdaptor::~CPropertyItemAdaptor()
 //------------------------------------------------------------------------
 // 
 //------------------------------------------------------------------------
-bool CPropertyItemAdaptor::Init( const std::string &valueName, 
+bool CPropertyItemAdapter::CreateProperty( const std::string &valueName, 
 	const visualizer::SSymbolInfo &symbol, _variant_t value )
 {
 	// static 변수는 프로세스끼리 공유할 수없으므로 0으로 출력한다.
@@ -82,42 +93,14 @@ bool CPropertyItemAdaptor::Init( const std::string &valueName,
 		pProp = new wxBoolProperty( valueName, wxPG_LABEL, value );
 		break;
 
-	case VT_DECIMAL:
-		{
-			//pProp = new CPropertyItem( valueName );
-			////common::str2wstr(valueName).c_str());
-			//pProp->SetVariantValue( value );
-
-			//_variant_t v1 = pProp->GetVariantValue();
-			//ASSERT(v1.vt == value.vt);
-		}
-		break;
-
-		//pProp = new CPropertyItem( valueName ); 
-		//	(_variant_t)(int)0, _T("") );
-		//pProp->SetVariantValue( value ); // TEST CODE
-		break;
-
 	default:
-		{
-		}
 		break;
 	}
-	//RETV(!pProp, NULL);
 
-	//if (!SetPropertyValue(pProp, value ))
-	//{
-	//	delete pProp;
-	//	return NULL;
-	//}
 	RETV(!pProp, false);
 
 	if (IsNotPrint)
-	{
 		pProp->Enable(false);
-		pProp->SetModifiedStatus(false);
-	}
-
 
 	m_pProperty = pProp;
 	return true;
@@ -125,30 +108,54 @@ bool CPropertyItemAdaptor::Init( const std::string &valueName,
 
 
 //------------------------------------------------------------------------
-// 
+// SetValue with _variant_t value
 //------------------------------------------------------------------------
-void CPropertyItemAdaptor::SetExpanded(bool expand)
+void CPropertyItemAdapter::SetVariant(const _variant_t &var)
+{
+	RET(!m_pProperty);
+	wxVariant wxVar = memmonitor::Variant2wxVariant(var);
+
+	if (m_pProperty->GetChoices().GetCount()) // enum value
+	{
+		m_pProperty->SetValue( wxVar );
+	}
+	else
+	{
+		m_pProperty->SetValue( wxVar );
+	}
+}
+
+
+//------------------------------------------------------------------------
+// wrapper functions
+//------------------------------------------------------------------------
+void CPropertyItemAdapter::SetExpanded(bool expand)
 {
 	RET(!m_pProperty);
 	m_pProperty->SetExpanded(expand);
 }
-void CPropertyItemAdaptor::SetModifiedStatus(bool modify)
+void CPropertyItemAdapter::SetModifiedStatus(bool modify)
 {
 	RET(!m_pProperty);
 	m_pProperty->SetModifiedStatus(modify);
 }
-void CPropertyItemAdaptor::Enable(bool enable)
+void CPropertyItemAdapter::Enable(bool enable)
 {
 	RET(!m_pProperty);
 	m_pProperty->Enable(enable);
 }
-void CPropertyItemAdaptor::AddChoice(const std::string &name, const int value ) // value = wxPG_INVALID_VALUE
+void CPropertyItemAdapter::AddChoice(const std::string &name, const int value ) // value = wxPG_INVALID_VALUE
 {
 	RET(!m_pProperty);
 	m_pProperty->AddChoice(name, value);
 }
-void CPropertyItemAdaptor::SetValue(const wxVariant &var)
+void CPropertyItemAdapter::SetValue(const wxVariant &var)
 {
 	RET(!m_pProperty);
 	m_pProperty->SetValue(var);
+}
+bool CPropertyItemAdapter::IsEnabled()
+{
+	RETV(!m_pProperty, false);
+	return m_pProperty->IsEnabled();
 }

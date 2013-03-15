@@ -3,10 +3,9 @@
 // Author:  jjuiddong
 // Date:    3/7/2013
 // 
-// show object in process memory or shared memory to tree control
+// show memory data
 //------------------------------------------------------------------------
 #pragma once
-
 #include "wx/treectrl.h"
 
 class wxTreeCtrl;
@@ -14,7 +13,9 @@ namespace memmonitor
 {
 	class CMemoryTree : public wxPanel
 	{
-		DECLARE_EVENT_TABLE()
+		enum  {
+			MENU_OPEN_PROPERTY,
+		};
 
 	public:
 		CMemoryTree(wxWindow *parent);
@@ -23,11 +24,15 @@ namespace memmonitor
 	protected:
 		bool LoadMemoryMap();
 		bool UpdateMemoryMap();
+
+		// Event Handler
+		DECLARE_EVENT_TABLE()
 		void OnTreectrlSelChanged( wxTreeEvent& event );
+		void OnContextMenu(wxContextMenuEvent& event);
+		void OnMenuOpenProperty(wxCommandEvent& event);
 
 	protected:
 		enum { ID_TREE };
 		wxTreeCtrl *m_pTree;
-
 	};
 }

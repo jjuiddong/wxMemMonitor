@@ -4,11 +4,14 @@
 #include "wx/treectrl.h"
 #include "PropertyWindow.h"
 #include "../Control/Global.h"
+#include "Frame.h"
 
 using namespace memmonitor;
 
 BEGIN_EVENT_TABLE( memmonitor::CMemoryTree, wxPanel )
 	EVT_TREE_SEL_CHANGED(ID_TREE, OnTreectrlSelChanged)
+	EVT_CONTEXT_MENU(CMemoryTree::OnContextMenu)
+	EVT_MENU(MENU_OPEN_PROPERTY, CMemoryTree::OnMenuOpenProperty)
 END_EVENT_TABLE()
 
 
@@ -21,7 +24,6 @@ CMemoryTree::CMemoryTree(wxWindow *parent) :
 		);
 
 	UpdateMemoryMap();
-
 }
 
 CMemoryTree::~CMemoryTree()
@@ -39,7 +41,7 @@ bool CMemoryTree::UpdateMemoryMap()
 
 	m_pTree->DeleteAllItems();
 
-	wxTreeItemId rootId = m_pTree->AddRoot(wxT("Root"));
+	wxTreeItemId rootId = m_pTree->AddRoot(wxT("@Root"));
 	sharedmemory::MemoryList memList;
 	sharedmemory::EnumerateMemoryInfo(memList);
 	BOOST_FOREACH(sharedmemory::SMemoryInfo &info, memList)
@@ -67,4 +69,28 @@ void CMemoryTree::OnTreectrlSelChanged( wxTreeEvent& event )
 	PropWindowPtr pPropWnd = GetPropertyWindow();
 	RET(!pPropWnd);
 	pPropWnd->UpdateSymbol( text );
+}
+
+
+//------------------------------------------------------------------------
+// Open Popup Menu
+//------------------------------------------------------------------------
+void CMemoryTree::OnContextMenu(wxContextMenuEvent& event)
+{
+	wxPoint point = event.GetPosition();
+	point = ScreenToClient(point);
+
+	wxMenu menu;
+	menu.Append(MENU_OPEN_PROPERTY, wxT("&Open Property"));
+	PopupMenu(&menu, point);
+}
+
+
+//------------------------------------------------------------------------
+// 
+//------------------------------------------------------------------------
+void CMemoryTree::OnMenuOpenProperty(wxCommandEvent& WXUNUSED(event))
+{
+	const wxString text = m_pTree->GetItemText(m_pTree->GetSelection());
+	GetFrame()->AddPropertyWindow( text );
 }

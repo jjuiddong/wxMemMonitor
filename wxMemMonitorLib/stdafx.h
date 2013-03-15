@@ -17,6 +17,9 @@
 #define ASSERT( x )		assert( (x) )
 
 #include "dia2.h"
+#include <atlbase.h>
+
+#undef wxUSE_CMDLINE_PARSER
 
 #include "wx/wxprec.h"
 #ifndef WX_PRECOMP
@@ -31,10 +34,12 @@ namespace memmonitor
 	class CMemoryTree;
 	class CLogWindow;
 	class CPropertyWindow;
+	class CFrame;
 
 	typedef common::ReferencePtr<CMemoryTree> MemTreePtr;
 	typedef common::ReferencePtr<CLogWindow> LogWindowPtr;
 	typedef common::ReferencePtr<CPropertyWindow> PropWindowPtr;
+	typedef common::ReferencePtr<CFrame> FramePtr;
 
 }
 
