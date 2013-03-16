@@ -24,8 +24,14 @@ namespace memmonitor
 		PropWindowPtr GetPropWindow() const;
 
 	protected:
-		bool	InitMemoryMonitor(const std::string &configFileName);
-		bool LoadConfigFile(const std::string &fileName);
+		void CreateMenuBar();
+		wxWindow* GetPane(const std::string &name);
+
+		// Event Handler
+		DECLARE_EVENT_TABLE()
+		void OnMenuOpenAutoExp(wxCommandEvent& event);
+		void OnMenuExit(wxCommandEvent& event);
+		void OnMenuHelp(wxCommandEvent& event);
 		
 	private:
 		wxAuiManager m_mgr;

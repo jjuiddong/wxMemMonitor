@@ -72,9 +72,13 @@ void CPropertyWindow::UpdateSymbol( const wxString &symbolName )
 	std::string str = sharedmemory::ParseObjectName(tmpStr);
 	const bool result = visualizer::MakeProperty_DefaultForm(this, tmpStr);
 
+	// root node expand
 	wxPGVIterator it;
 	for ( it = pPropGrid->GetVIterator( wxPG_ITERATE_FIXED_CHILDREN ); !it.AtEnd(); it.Next() )
+	{
 		it.GetProperty()->SetExpanded( true );
+		break;
+	}
 
 	CheckSymbol( symbolName );
 

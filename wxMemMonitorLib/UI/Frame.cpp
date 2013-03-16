@@ -7,10 +7,22 @@
 #include "../Control/Global.h"
 #include "../dia/DiaWrapper.h"
 #include "../visualizer/PropertyMaker.h"
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
+
 
 using namespace memmonitor;
+
+enum MAINFRAME_MENU
+{
+	MENU_OPEN_AUTOEXP,
+	MENU_EXIT,
+	MENU_HELP,
+};
+
+BEGIN_EVENT_TABLE(CFrame, wxFrame)
+	 EVT_MENU (MENU_OPEN_AUTOEXP, CFrame::OnMenuOpenAutoExp)
+	 EVT_MENU (MENU_EXIT, CFrame::OnMenuExit)
+	 EVT_MENU (MENU_HELP, CFrame::OnMenuHelp)
+END_EVENT_TABLE()
 
 
 CFrame::CFrame(wxWindow* parent) : wxFrame(parent, -1, _("wxMemMonitor"),
@@ -34,6 +46,8 @@ CFrame::CFrame(wxWindow* parent) : wxFrame(parent, -1, _("wxMemMonitor"),
 	// tell the manager to "commit" all the changes just made
 	m_mgr.Update();
 
+	CreateMenuBar();
+
 	m_pMemTree = memTree;
 	m_pLogWnd = logWnd;
 	m_pPropWnd = propWnd;
@@ -43,17 +57,41 @@ CFrame::CFrame(wxWindow* parent) : wxFrame(parent, -1, _("wxMemMonitor"),
 	if (IsInitSuccess)
 	{
 		visualizer::OpenVisualizerScript( "autoexp.txt" );
-		LoadConfigFile( GetConfigFileName() );
+		ReadConfigFile( GetConfigFileName() );
+		RepositioningWindow();
 	}
 }
 
 CFrame::~CFrame()
 {
+	WriteWindowPosition();
 	// deinitialize the frame manager
 	m_mgr.UnInit();
 	dia::CDiaWrapper::Get()->Release();
 	sharedmemory::Release();
 	visualizer::Release();
+}
+
+
+//------------------------------------------------------------------------
+// 
+//------------------------------------------------------------------------
+void CFrame::CreateMenuBar()
+{
+	// file Menu
+	wxMenu *fileMenu = new wxMenu;
+	fileMenu->Append( MENU_OPEN_AUTOEXP, "&Open AutoExp" );
+	fileMenu->Append( MENU_EXIT, "&Exit" );
+
+	// help menu
+	wxMenu *helpMenu = new wxMenu;
+	helpMenu->Append( MENU_HELP, "&Help" );
+
+	// menuBar
+	wxMenuBar* menuBar = new wxMenuBar( wxMB_DOCKABLE );
+	menuBar->Append(fileMenu, "&File");
+	menuBar->Append(helpMenu, "&Help");
+	SetMenuBar(menuBar);
 }
 
 
@@ -73,91 +111,42 @@ bool CFrame::AddPropertyWindow(const wxString &symbolName )
 
 
 //------------------------------------------------------------------------
-// open configfile, json file format 
+// 
 //------------------------------------------------------------------------
-bool	CFrame::InitMemoryMonitor(const std::string &configFileName)
+wxWindow* CFrame::GetPane(const std::string &name)
 {
-	try
+	wxAuiPaneInfoArray allpanes = m_mgr.GetAllPanes();
+	for (size_t i=0; i < allpanes.size(); ++i)
 	{
-		// boost property tree
-		using boost::property_tree::ptree;
-		using std::string;
-		ptree props;
-		boost::property_tree::read_json(configFileName.c_str(), props);
-		string pdbPath = props.get<string>("pdbpath");
-		string shareMemoryName = props.get<string>("sharedmemoryname");
-
-		// Pdb Load
-		if (!dia::CDiaWrapper::Get()->Init(pdbPath))
-		{
-			SetErrorMsg(
-				common::format("%s Pdb 파일이 없습니다.\n", pdbPath.c_str()) );
-			return false;
-		}
-		if (!sharedmemory::Init(shareMemoryName, sharedmemory::SHARED_CLIENT))
-		{
-			SetErrorMsg(
-				common::format("%s  이름의 공유메모리가 없습니다.\n", 
-				shareMemoryName.c_str()) );
-			return false;
-		}
+		if (allpanes[ i].caption == name)
+			return allpanes[ i].window;
 	}
-	catch (std::exception &e)
-	{
-		SetErrorMsg(
-			common::format( "\"%s\" json script Err!! [%s]\n",  
-			configFileName.c_str(), e.what()) );
-		return false;
-	}
-
-	return true;
+	return NULL;
 }
 
 
 //------------------------------------------------------------------------
-// read configfile, read attribute "property" : [ ] 
-// then create property window
+// 
 //------------------------------------------------------------------------
-bool CFrame::LoadConfigFile(const std::string &fileName)
+void CFrame::OnMenuOpenAutoExp(wxCommandEvent& event)
 {
-	if (fileName.empty())
-	{
-		GetLogWindow()->PrintText( "not found config file\n" );
-		return false;
-	}
+	::WinExec( "notepad.exe autoexp.txt", SW_SHOW);
+}
 
-	try
-	{
-		// boost property tree
-		using boost::property_tree::ptree;
-		using std::string;
-		ptree props;
-		boost::property_tree::read_json(fileName.c_str(), props);
-		ptree &childs = props.get_child("property");
-		BOOST_FOREACH(ptree::value_type &vt, childs)
-		{
-			const string name = vt.second.get<string>("symbolname");
-			// 			int val[ 4] = {0,};
-			// 			int cnt =0;
-			// 			ptree::assoc_iterator it = vt.second.find("rect");
-			// 			if (vt.second.not_found() != it)
-			// 			{
-			// 				ptree &rect = vt.second.get_child("rect");
-			// 				BOOST_FOREACH(ptree::value_type &vt, rect)
-			// 				{
-			// 					val[ cnt++] = atoi(vt.second.data().c_str());
-			// 				}
-			// 			}
-			//			CRect propertyRect(val[0], val[1], val[2], val[3]);
-			//CString symbolName = common::str2wstr(name).c_str();
-			AddPropertyWindow( name );
-		}
-	}
-	catch (std::exception &e)
-	{
-		GetLogWindow()->PrintText( 
-			wxString("(") + fileName.c_str() + ") " + e.what() );
-	}
 
-	return true;
+//------------------------------------------------------------------------
+// 
+//------------------------------------------------------------------------
+void CFrame::OnMenuExit(wxCommandEvent& event)
+{
+	Close(true);
+}
+
+
+//------------------------------------------------------------------------
+// 
+//------------------------------------------------------------------------
+void CFrame::OnMenuHelp(wxCommandEvent& event)
+{
+
 }

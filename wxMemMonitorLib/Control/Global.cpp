@@ -3,6 +3,12 @@
 #include "../wxMemMonitor.h"
 #include "Global.h"
 #include "../ui/Frame.h"
+#include "../ui/LogWindow.h"
+#include "../dia/DiaWrapper.h"
+#include "../visualizer/PropertyMaker.h"
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
 
 namespace memmonitor
 {
@@ -191,4 +197,176 @@ _variant_t memmonitor::wxVariant2Variant(const VARTYPE &vartype, const wxVariant
 		break;
 	}
 	return var;
+}
+
+
+
+//------------------------------------------------------------------------
+// open configfile, json file format 
+//------------------------------------------------------------------------
+bool	memmonitor::InitMemoryMonitor(const std::string &configFileName)
+{
+	try
+	{
+		using boost::property_tree::ptree;
+		using std::string;
+		ptree props;
+		boost::property_tree::read_json(configFileName.c_str(), props);
+		string pdbPath = props.get<string>("pdbpath");
+		string shareMemoryName = props.get<string>("sharedmemoryname");
+
+		// Pdb Load
+		if (!dia::CDiaWrapper::Get()->Init(pdbPath))
+		{
+			SetErrorMsg(
+				common::format("%s Pdb 파일이 없습니다.\n", pdbPath.c_str()) );
+			return false;
+		}
+		if (!sharedmemory::Init(shareMemoryName, sharedmemory::SHARED_CLIENT))
+		{
+			SetErrorMsg(
+				common::format("%s  이름의 공유메모리가 없습니다.\n", 
+				shareMemoryName.c_str()) );
+			return false;
+		}
+	}
+	catch (std::exception &e)
+	{
+		SetErrorMsg(
+			common::format( "\"%s\" json script Err!! [%s]\n",  
+			configFileName.c_str(), e.what()) );
+		return false;
+	}
+
+	return true;
+}
+
+
+//------------------------------------------------------------------------
+// read configfile, read attribute "property" : [ ] 
+// then create property window
+//------------------------------------------------------------------------
+bool memmonitor::ReadConfigFile(const std::string &fileName)
+{
+	if (fileName.empty())
+	{
+		GetLogWindow()->PrintText( "not found config file\n" );
+		return false;
+	}
+
+	try
+	{
+		using boost::property_tree::ptree;
+		using std::string;
+		ptree props;
+		boost::property_tree::read_json(fileName.c_str(), props);
+		ptree &childs = props.get_child("property");
+		BOOST_FOREACH(ptree::value_type &vt, childs)
+		{
+			const string name = vt.second.get<string>("symbolname");
+			GetFrame()->AddPropertyWindow( name );
+		}
+	}
+	catch (std::exception &e)
+	{
+		GetLogWindow()->PrintText( 
+			wxString("(") + fileName.c_str() + ") " + e.what() );
+	}
+	return true;
+}
+
+
+//------------------------------------------------------------------------
+// 
+//------------------------------------------------------------------------
+wxRect ParseRect(const std::string rectStr)
+{
+	wxRect r(0,0,0,0);
+	sscanf( rectStr.c_str(), "%d %d %d %d", &r.x, &r.y, &r.width, &r.height);
+	return r;
+}
+
+
+//------------------------------------------------------------------------
+// re calculate window position
+// main frame window, memory tree window, property window
+//------------------------------------------------------------------------
+bool memmonitor::RepositioningWindow()
+{
+	try
+	{
+		using boost::property_tree::ptree;
+		using std::string;
+		ptree props;
+		boost::property_tree::read_json( "windowpos.json", props );
+
+		string mainW  = props.get<string>("main window");
+		wxRect mainR = ParseRect(mainW);
+		GetFrame()->SetSize(mainR);
+
+		//wxAuiPaneInfoArray allpanes = m_mgr.GetAllPanes();
+		//for (size_t i=0; i < allpanes.size(); ++i)
+		//{
+		//	string name = (const char*)allpanes[ i].caption;
+		//	string rectStr = props.get<string>(name, "" );
+		//	if (rectStr.empty()) continue;
+
+		//	string IsFloat = props.get<string>( std::string(name + " float").c_str(), "" );
+		//	if (!IsFloat.empty())
+		//	{
+		//		//allpanes[ i].FloatingPosition(100, 100);
+		//		//m_mgr.CreateFloatingFrame(this, allpanes[ i] );
+		//	}
+
+		//	wxRect r = ParseRect(rectStr);
+		//	allpanes[ i].window->SetSize( r );
+		//}
+	}
+	catch (std::exception &e)
+	{
+		GetLogWindow()->PrintText( wxString(e.what()) + "\n" );
+		GetLogWindow()->PrintText( "\n" );
+	}
+
+	//m_mgr.Update();
+
+	return true;
+}
+
+
+//------------------------------------------------------------------------
+// 
+//------------------------------------------------------------------------
+void memmonitor::WriteWindowPosition()
+{
+	try
+	{
+		using boost::property_tree::ptree;
+		using std::string;
+		ptree props;
+
+		wxRect mainW = GetFrame()->GetRect();
+		props.add( "main window", 
+			common::format("%d %d %d %d", mainW.x, mainW.y, mainW.width, mainW.height) );
+
+		//wxAuiPaneInfoArray allpanes = m_mgr.GetAllPanes();
+		//for (size_t i=0; i < allpanes.size(); ++i)
+		//{
+		//	wxRect r = allpanes[ i].window->GetScreenRect();
+		//	std::string name = (const char*)allpanes[ i].caption;
+		//	props.add( name.c_str(), common::format("%d %d %d %d", r.x, r.y, r.width, r.height) );
+
+		//	if (allpanes[ i].IsFloating())
+		//	{
+		//		wxString saveInfo = m_mgr.SavePaneInfo( allpanes[ i] );
+		//		props.add( std::string(name + " float").c_str(), (const char*)saveInfo);
+		//	}
+		//}
+
+		boost::property_tree::write_json( "windowpos.json", props );
+	}
+	catch (std::exception &e)
+	{
+		GetLogWindow()->PrintText( e.what() );
+	}
 }

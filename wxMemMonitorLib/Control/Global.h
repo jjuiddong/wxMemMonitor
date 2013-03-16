@@ -19,6 +19,10 @@ namespace memmonitor
 		STypeData() {}
 	};
 
+	bool							InitMemoryMonitor(const std::string &configFileName);
+	bool							ReadConfigFile(const std::string &fileName);
+	bool							RepositioningWindow();
+	void							WriteWindowPosition();
 
 	EXECUTE_TYPE		GetExecuteType();
 	void							SetExecuteType(EXECUTE_TYPE type);
