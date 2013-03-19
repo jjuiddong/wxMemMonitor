@@ -48,6 +48,7 @@ namespace memmonitor
 
 		// Event Handler
 		DECLARE_EVENT_TABLE()
+		void OnSize(wxSizeEvent& event);
 		void OnPropertyGridChange( wxPropertyGridEvent& event );
 		void OnPropertyGridSelect( wxPropertyGridEvent& event );
 		void OnContextMenu(wxContextMenuEvent& event);

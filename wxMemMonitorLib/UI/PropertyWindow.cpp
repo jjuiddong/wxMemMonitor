@@ -13,6 +13,7 @@ using namespace dia;
 using namespace visualizer;
 
 BEGIN_EVENT_TABLE( memmonitor::CPropertyWindow, wxPropertyGridManager )
+	EVT_SIZE(CPropertyWindow::OnSize)
 	EVT_CONTEXT_MENU(CPropertyWindow::OnContextMenu)
 	EVT_MENU(MENU_OPEN_PROPERTY, CPropertyWindow::OnMenuOpenProperty)
 	EVT_TIMER(ID_REFRESH_TIMER, CPropertyWindow::OnRefreshTimer)
@@ -144,6 +145,25 @@ void	CPropertyWindow::AddProperty( wxPGProperty *pParentProp, wxPGProperty *prop
 	else
 	{
 		wxPGProperty *pg = Append(prop);
+	}
+}
+
+
+
+/**
+ @brief Resize Event Handler
+ */
+void CPropertyWindow::OnSize(wxSizeEvent& event)
+{
+	if (GetParent() != (void*)GetFrame())
+	{
+		const wxRect r = GetParent()->GetSize();
+		SetSize(r);
+		RecalculatePositions(r.width, r.height);
+	}
+	else
+	{
+		event.Skip();
 	}
 }
 

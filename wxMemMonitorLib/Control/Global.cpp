@@ -304,31 +304,22 @@ bool memmonitor::RepositioningWindow()
 		wxRect mainR = ParseRect(mainW);
 		GetFrame()->SetSize(mainR);
 
-		//wxAuiPaneInfoArray allpanes = m_mgr.GetAllPanes();
-		//for (size_t i=0; i < allpanes.size(); ++i)
-		//{
-		//	string name = (const char*)allpanes[ i].caption;
-		//	string rectStr = props.get<string>(name, "" );
-		//	if (rectStr.empty()) continue;
+		const CFrame::PropertyFrames &frames = GetFrame()->GetPropFrames();
+		BOOST_FOREACH(auto &frame, frames)
+		{
+			const string name = (const char*)frame->GetTitle();
+			const string rectStr = props.get<string>(name, "" );
+			if (rectStr.empty()) continue;
 
-		//	string IsFloat = props.get<string>( std::string(name + " float").c_str(), "" );
-		//	if (!IsFloat.empty())
-		//	{
-		//		//allpanes[ i].FloatingPosition(100, 100);
-		//		//m_mgr.CreateFloatingFrame(this, allpanes[ i] );
-		//	}
-
-		//	wxRect r = ParseRect(rectStr);
-		//	allpanes[ i].window->SetSize( r );
-		//}
+			wxRect r = ParseRect(rectStr);
+			frame->SetSize(r);
+		}
 	}
 	catch (std::exception &e)
 	{
 		GetLogWindow()->PrintText( wxString(e.what()) + "\n" );
 		GetLogWindow()->PrintText( "\n" );
 	}
-
-	//m_mgr.Update();
 
 	return true;
 }
@@ -349,19 +340,13 @@ void memmonitor::WriteWindowPosition()
 		props.add( "main window", 
 			common::format("%d %d %d %d", mainW.x, mainW.y, mainW.width, mainW.height) );
 
-		//wxAuiPaneInfoArray allpanes = m_mgr.GetAllPanes();
-		//for (size_t i=0; i < allpanes.size(); ++i)
-		//{
-		//	wxRect r = allpanes[ i].window->GetScreenRect();
-		//	std::string name = (const char*)allpanes[ i].caption;
-		//	props.add( name.c_str(), common::format("%d %d %d %d", r.x, r.y, r.width, r.height) );
-
-		//	if (allpanes[ i].IsFloating())
-		//	{
-		//		wxString saveInfo = m_mgr.SavePaneInfo( allpanes[ i] );
-		//		props.add( std::string(name + " float").c_str(), (const char*)saveInfo);
-		//	}
-		//}
+		const CFrame::PropertyFrames &frames = GetFrame()->GetPropFrames();
+		BOOST_FOREACH(auto &frame, frames)
+		{
+			string name = (const char*)frame->GetTitle();
+			wxRect r = frame->GetScreenRect();
+			props.add( name.c_str(), common::format("%d %d %d %d", r.x, r.y, r.width, r.height) );
+		}
 
 		boost::property_tree::write_json( "windowpos.json", props );
 	}

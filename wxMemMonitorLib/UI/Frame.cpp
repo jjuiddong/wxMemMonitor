@@ -38,6 +38,10 @@ CFrame::CFrame(wxWindow* parent) : wxFrame(parent, -1, _("wxMemMonitor"),
 	CLogWindow *logWnd = new CLogWindow(this);
 	CPropertyWindow *propWnd = new CPropertyWindow(this);
 
+	//wxMiniFrame *pframe = new wxMiniFrame(this, -1, "mini");
+	//pframe->SetWindowStyle(wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX);
+	//pframe->Show();
+
 	// add the panes to the manager
 	m_mgr.AddPane(logWnd, wxBOTTOM, wxT("Log Window"));
 	m_mgr.AddPane(memTree, wxLEFT, wxT("Memory Tree"));
@@ -100,13 +104,40 @@ void CFrame::CreateMenuBar()
 //------------------------------------------------------------------------
 bool CFrame::AddPropertyWindow(const wxString &symbolName )
 {
-	CPropertyWindow *propWnd = new CPropertyWindow(this);
-	m_mgr.AddPane(propWnd, wxRIGHT, symbolName);
-	m_mgr.Update();
+	wxMiniFrame *pframe = new wxMiniFrame(this, -1, symbolName);
+	pframe->SetWindowStyle(wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX);
+	wxBoxSizer* itemBoxSizer = new wxBoxSizer(wxVERTICAL);
+	pframe->SetSizer(itemBoxSizer);
 
+	CPropertyWindow *propWnd = new CPropertyWindow(pframe);
+	itemBoxSizer->Add(propWnd);
 	propWnd->UpdateSymbol(symbolName);
+	pframe->Show();
 
+	pframe->Bind(wxEVT_CLOSE_WINDOW, &CFrame::OnPropertyFrameClose, this);
+
+	m_PropFrames.push_back(pframe);
 	return true;
+}
+
+
+/**
+ @brief PropertyMiniFrame Close Event Handler
+ */
+void CFrame::OnPropertyFrameClose(wxCloseEvent& event)
+{
+	event.Skip();
+
+	// remove close miniframe object
+	BOOST_FOREACH(auto &propFrame, m_PropFrames)
+	{
+		if (propFrame == event.GetEventObject())
+		{
+			const wxString title = propFrame->GetTitle();  // debug
+			m_PropFrames.remove(propFrame);
+			break;
+		}
+	}
 }
 
 
