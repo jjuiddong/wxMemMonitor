@@ -12,6 +12,7 @@ BEGIN_EVENT_TABLE( memmonitor::CMemoryTree, wxPanel )
 	EVT_TREE_SEL_CHANGED(ID_TREE, OnTreectrlSelChanged)
 	EVT_CONTEXT_MENU(CMemoryTree::OnContextMenu)
 	EVT_MENU(MENU_OPEN_PROPERTY, CMemoryTree::OnMenuOpenProperty)
+	EVT_TIMER(ID_REFRESH_TIMER, CMemoryTree::OnRefreshTimer)
 END_EVENT_TABLE()
 
 
@@ -24,6 +25,11 @@ CMemoryTree::CMemoryTree(wxWindow *parent) :
 		);
 
 	UpdateMemoryMap();
+
+	m_Timer.SetOwner(this, ID_REFRESH_TIMER);
+	m_Timer.Start( REFRESH_INTERVAL );
+
+	Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CMemoryTree::OnKeyDown));
 }
 
 CMemoryTree::~CMemoryTree()
@@ -39,6 +45,11 @@ bool CMemoryTree::UpdateMemoryMap()
 {
 	RETV(!m_pTree, false);
 
+	const wxTreeItemId selectId = m_pTree->GetSelection();
+	wxString selectItemName;
+	if (selectId.IsOk())
+		selectItemName = m_pTree->GetItemText(selectId);
+
 	m_pTree->DeleteAllItems();
 
 	wxTreeItemId rootId = m_pTree->AddRoot(wxT("@Root"));
@@ -50,13 +61,22 @@ bool CMemoryTree::UpdateMemoryMap()
 		m_pTree->AppendItem( itemId, wxString::Format("size: %d", info.size) );
 		m_pTree->AppendItem( itemId, wxString::Format("ptr: 0x%x", (DWORD)info.ptr) );
 
-		//if (selectItemName == info.name)
-		//	SelectItem(hItem);
+		if (selectItemName == info.name)
+			m_pTree->SelectItem(itemId);
 	}
 	m_pTree->SortChildren(rootId);
 	m_pTree->Expand(rootId);
 
 	return true;
+}
+
+
+//------------------------------------------------------------------------
+// Property Refresh Timer
+//------------------------------------------------------------------------
+void CMemoryTree::OnRefreshTimer(wxTimerEvent& event)
+{
+	UpdateMemoryMap();
 }
 
 
@@ -94,3 +114,18 @@ void CMemoryTree::OnMenuOpenProperty(wxCommandEvent& WXUNUSED(event))
 	const wxString text = m_pTree->GetItemText(m_pTree->GetSelection());
 	GetFrame()->AddPropertyWindow( text );
 }
+
+
+/**
+ @brief KeyDown Event Handler
+ */
+void CMemoryTree::OnKeyDown(wxKeyEvent& event)
+{
+	event.Skip();
+	if (344 == event.GetKeyCode()) // F5
+	{
+		UpdateMemoryMap();
+	}
+
+}
+

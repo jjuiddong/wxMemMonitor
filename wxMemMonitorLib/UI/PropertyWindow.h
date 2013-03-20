@@ -18,7 +18,7 @@ namespace memmonitor
 	class CPropertyWindow : public wxPropertyGridManager
 	{
 		enum  {
-			MENU_OPEN_PROPERTY,
+			MENU_OPEN_PROPERTY=500,
 			ID_REFRESH_TIMER,
 			REFRESH_INTERVAL = 1000,
 		};
@@ -54,6 +54,7 @@ namespace memmonitor
 		void OnContextMenu(wxContextMenuEvent& event);
 		void OnMenuOpenProperty(wxCommandEvent& event);
 		void OnRefreshTimer(wxTimerEvent& event);
+		void OnKeyDown(wxKeyEvent& event);
 
 	protected:
 		wxString	m_CurrentSymbolName;

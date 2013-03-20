@@ -44,6 +44,7 @@ CPropertyWindow::CPropertyWindow(wxWindow *parent)  :
 		wxPropertyGridEventHandler(CPropertyWindow::OnPropertyGridChange) );
 	Connect(GetId(), wxEVT_PG_SELECTED,
 		wxPropertyGridEventHandler(CPropertyWindow::OnPropertyGridSelect) );	
+	Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CPropertyWindow::OnKeyDown));
 }
 
 CPropertyWindow::~CPropertyWindow() 
@@ -337,3 +338,20 @@ void CPropertyWindow::ClearPropItem()
 	}
 	m_PropList.clear();
 }
+
+
+/**
+ @brief KeyDown Event Handler
+ */
+void CPropertyWindow::OnKeyDown(wxKeyEvent& event)
+{
+	event.Skip();
+	if (344 == event.GetKeyCode()) // F5
+	{
+		wxPropertyGrid *pPropGrid = GetGrid();
+		wxPGVIterator it;
+		for ( it = pPropGrid->GetVIterator( wxPG_ITERATE_FIXED_CHILDREN ); !it.AtEnd(); it.Next() )
+			RefreshPropertyItem( it.GetProperty() );
+	}
+}
+

@@ -14,7 +14,9 @@ namespace memmonitor
 	class CMemoryTree : public wxPanel
 	{
 		enum  {
-			MENU_OPEN_PROPERTY,
+			MENU_OPEN_PROPERTY = 300,
+			ID_REFRESH_TIMER,
+			REFRESH_INTERVAL = 60000, // 1 second
 		};
 
 	public:
@@ -30,9 +32,12 @@ namespace memmonitor
 		void OnTreectrlSelChanged( wxTreeEvent& event );
 		void OnContextMenu(wxContextMenuEvent& event);
 		void OnMenuOpenProperty(wxCommandEvent& event);
+		void OnRefreshTimer(wxTimerEvent& event);
+		void OnKeyDown(wxKeyEvent& event);
 
 	protected:
 		enum { ID_TREE };
 		wxTreeCtrl *m_pTree;
+		wxTimer	m_Timer;
 	};
 }

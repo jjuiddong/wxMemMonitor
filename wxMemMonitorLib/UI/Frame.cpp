@@ -13,7 +13,7 @@ using namespace memmonitor;
 
 enum MAINFRAME_MENU
 {
-	MENU_OPEN_AUTOEXP,
+	MENU_OPEN_AUTOEXP=100,
 	MENU_EXIT,
 	MENU_HELP,
 };
@@ -22,6 +22,7 @@ BEGIN_EVENT_TABLE(CFrame, wxFrame)
 	 EVT_MENU (MENU_OPEN_AUTOEXP, CFrame::OnMenuOpenAutoExp)
 	 EVT_MENU (MENU_EXIT, CFrame::OnMenuExit)
 	 EVT_MENU (MENU_HELP, CFrame::OnMenuHelp)
+ 	//EVT_KEY_DOWN(CFrame::OnKeyDown)
 END_EVENT_TABLE()
 
 
@@ -58,12 +59,13 @@ CFrame::CFrame(wxWindow* parent) : wxFrame(parent, -1, _("wxMemMonitor"),
 
 	if (!IsInitSuccess)
 		GetLogWindow()->PrintText( GetLastError() );
-	if (IsInitSuccess)
+	//if (IsInitSuccess)
 	{
 		visualizer::OpenVisualizerScript( "autoexp.txt" );
 		ReadConfigFile( GetConfigFileName() );
 		RepositioningWindow();
 	}
+
 }
 
 CFrame::~CFrame()
