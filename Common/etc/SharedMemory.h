@@ -84,15 +84,18 @@ namespace sharedmemory
 
 		void operator delete (void *ptr)
 		{
-			sharedmemory::DeAllocate(ptr);
+			if (!sharedmemory::DeAllocate(ptr))
+				free(ptr);
 		}
 		void operator delete (void *ptr, char *attachTypeName)
 		{
-			sharedmemory::DeAllocate(ptr);
+			if (!sharedmemory::DeAllocate(ptr))
+				free(ptr);
 		}
 		void operator delete[] (void *ptr)
 		{
-			sharedmemory::DeAllocate(ptr);
+			if (!sharedmemory::DeAllocate(ptr))
+				free(ptr);
 		}
 
 	private:
@@ -103,7 +106,10 @@ namespace sharedmemory
 			if (attachTypeName)
 				ss << attachTypeName;
 			ss << ++m_Count;
-			return sharedmemory::Allocate(ss.str(), size);
+			void *ptr = sharedmemory::Allocate(ss.str(), size);
+			if (!ptr)
+				ptr = malloc(size);
+			return ptr;
 		}
 	};
 

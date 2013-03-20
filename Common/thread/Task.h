@@ -13,30 +13,32 @@ namespace common
 	class CTask
 	{
 	public:
-		CTask(int id, const std::string &name="") : m_Id(id), m_pThread(NULL), m_Name(name) {}
-		virtual ~CTask() {}
-
 		enum RUN_RESULT
 		{
 			RR_END,			// 태스크 종료
 			RR_CONTINUE,	// 태스크 계속실행
 		};
 
-	protected:
-		int					m_Id;
-		CThread				*m_pThread;
-		std::string			m_Name;
-
-	public:
-		int					GetId() const { return m_Id; }
-		const std::string&	GetName() const { return m_Name; }
-		void				SetThread(CThread *p) { m_pThread = p; }
+		CTask(int id, const std::string &name="");// : m_Id(id), m_pThread(NULL), m_Name(name) {}
+		virtual ~CTask() {}
+		int GetId() const;
+		const std::string& GetName() const;
+		void	SetThread(CThread *p);
 
 		// overriding
 		virtual RUN_RESULT	Run() { return RR_END; }
-		virtual void		MessageProc( int msg, WPARAM wParam, LPARAM lParam ) {}
+		virtual void MessageProc( threadmsg::MSG msg, WPARAM wParam, LPARAM lParam, LPARAM added ) {}
 
+	protected:
+		int				m_Id;
+		CThread		*m_pThread;
+		std::string	m_Name;
 	};
+
+	inline CTask::CTask(int id, const std::string &name) : m_Id(id), m_pThread(NULL), m_Name(name) { }
+	inline int CTask::GetId() const { return m_Id; }
+	inline const std::string& CTask::GetName() const { return m_Name; }
+	inline void	 CTask::SetThread(CThread *p) { m_pThread = p; }
 
 
 	// list<CTask*>에서 CTask를 찾는 객체

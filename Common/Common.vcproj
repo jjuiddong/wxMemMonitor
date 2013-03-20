@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(LIBOUT)"
+			IntermediateDirectory="$(OUT)"
 			ConfigurationType="4"
 			CharacterSet="1"
 			>
@@ -81,9 +81,10 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(LIBOUT)"
+			IntermediateDirectory="$(OUT)"
 			ConfigurationType="4"
+			InheritedPropertySheets="..\..\CommonPropertySheet.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -404,6 +405,14 @@
 			</File>
 			<File
 				RelativePath=".\thread\Thread.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Container"
+			>
+			<File
+				RelativePath=".\container\VectorMap.h"
 				>
 			</File>
 		</Filter>

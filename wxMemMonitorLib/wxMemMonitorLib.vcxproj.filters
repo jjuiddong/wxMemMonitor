@@ -24,6 +24,9 @@
     <Filter Include="Src\dia">
       <UniqueIdentifier>{6b3aea34-e4a5-4662-bbbb-e28280778d81}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\memory">
+      <UniqueIdentifier>{a6f8e518-28bc-46cf-af4d-9c1b85125ec5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -121,6 +124,9 @@
     </ClCompile>
     <ClCompile Include="UI\PropertyItemAdapter.cpp">
       <Filter>Src\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\allocmemory.cpp">
+      <Filter>Src\memory</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

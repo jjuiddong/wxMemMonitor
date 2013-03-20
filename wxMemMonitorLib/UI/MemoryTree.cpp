@@ -13,6 +13,7 @@ BEGIN_EVENT_TABLE( memmonitor::CMemoryTree, wxPanel )
 	EVT_CONTEXT_MENU(CMemoryTree::OnContextMenu)
 	EVT_MENU(MENU_OPEN_PROPERTY, CMemoryTree::OnMenuOpenProperty)
 	EVT_TIMER(ID_REFRESH_TIMER, CMemoryTree::OnRefreshTimer)
+	EVT_WINDOW_DESTROY(CMemoryTree::OnDestroy)
 END_EVENT_TABLE()
 
 
@@ -26,8 +27,8 @@ CMemoryTree::CMemoryTree(wxWindow *parent) :
 
 	UpdateMemoryMap();
 
-	m_Timer.SetOwner(this, ID_REFRESH_TIMER);
-	m_Timer.Start( REFRESH_INTERVAL );
+	//m_Timer.SetOwner(this, ID_REFRESH_TIMER);
+	//m_Timer.Start( REFRESH_INTERVAL );
 
 	Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CMemoryTree::OnKeyDown));
 }
@@ -85,6 +86,7 @@ void CMemoryTree::OnRefreshTimer(wxTimerEvent& event)
 //------------------------------------------------------------------------
 void CMemoryTree::OnTreectrlSelChanged( wxTreeEvent& event )
 {
+	return;
 	const wxString text = m_pTree->GetItemText( event.GetItem() );
 	PropWindowPtr pPropWnd = GetPropertyWindow();
 	RET(!pPropWnd);
@@ -129,3 +131,11 @@ void CMemoryTree::OnKeyDown(wxKeyEvent& event)
 
 }
 
+
+//------------------------------------------------------------------------
+// 
+//------------------------------------------------------------------------
+void CMemoryTree::OnDestroy(wxWindowDestroyEvent &event)
+{
+	m_Timer.Stop();
+}

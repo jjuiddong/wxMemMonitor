@@ -12,6 +12,7 @@
 
 #pragma warning (disable: 4996)	// strcpy 경고 제거
 
+#include <list>
 #include "wx/wxprec.h"
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
@@ -44,6 +45,112 @@ namespace memmonitor
 	// Error Report
 	const std::string& GetLastError();
 
+
+
+
+	
+	
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// MEMORY FUNCTION
+	
+	/// Memory Info
+	struct SMemInfo
+	{
+		std::string name;
+		void *ptr;
+		size_t size;
+		SMemInfo() {}
+		SMemInfo(const char *n, void *p, size_t s):name(n), ptr(p), size(s) {}
+	};
+	typedef std::list<SMemInfo> MemoryList;
+
+
+	void*	Allocate(const std::string &name, size_t size);
+	bool		DeAllocate(void *ptr);
+	void		EnumerateMemoryInfo(OUT MemoryList &memList);	
+	bool		FindMemoryInfo(const std::string &name, OUT SMemInfo &info);
+	void*	MemoryMapping(void *srcPtr );
+	std::string ParseObjectName(const std::string &objectName);
+	bool		CheckValidAddress(const void *ptr );
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// operator new, delete overloading template class
+	template<class T, class typeName> // typeName = DECLARE_TYPE_NAME() 매크로를 통해 만들어짐
+	class Monitor
+	{
+	public:
+		void* operator new (size_t size)
+		{
+			return Allocate(size);
+		}
+		//attachTypeName : typeName에 추가적으로 붙게되는 이름
+		// 호출 방법: Type *p = new ("attachTypeName") Type();
+		void* operator new (size_t size, char *attachTypeName)
+		{
+			// Name = typeName + # + attachTypeName + m_Count
+			return Allocate(size, attachTypeName);
+		}
+		void* operator new[] (size_t size)
+		{
+			return Allocate(size);
+		}
+
+		// Debug new
+		void* operator new (size_t size, char* lpszFileName, int nLine)
+		{
+			return Allocate(size);
+		}
+		// Debug new
+		void* operator new[] (size_t size, char* lpszFileName, int nLine)
+		{
+			return Allocate(size);
+		}
+
+		void operator delete (void *ptr)
+		{
+			DeAllocate(ptr);
+		}
+		void operator delete (void *ptr, char* lpszFileName, int nLine)
+		{
+			DeAllocate(ptr);
+		}
+		void operator delete (void *ptr, char *attachTypeName)
+		{
+			DeAllocate(ptr);
+		}
+		void operator delete[] (void *ptr)
+		{
+			DeAllocate(ptr);
+		}
+
+	private:
+		static void* Allocate(const size_t size, char *attachTypeName=NULL)
+		{
+			std::stringstream ss;
+			ss << typeName::typeName() << "#";
+			if (attachTypeName)
+				ss << attachTypeName;
+			ss << ++m_Count;
+			return Allocate(ss.str(), size);
+		}
+
+		static int m_Count;
+	};
+
+	template<class T, class typeName>
+	int Monitor<T,typeName>::m_Count=0;
+
+
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	// Sub System
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////
 	// App
 	class CApp : public wxApp
 	{
@@ -51,4 +158,21 @@ namespace memmonitor
 		virtual bool OnInit();
 		virtual void ExitMainLoop();
 	};
+
 }
+
+
+#define DECLARE_TYPE_NAME(className)					\
+struct className##typeNameWrap								\
+{																						\
+	static char* typeName() { return #className; }		\
+};
+
+#define DECLARE_TYPE_NAME_SCOPE(scope, className)				\
+struct className##typeNameWrap													\
+{																											\
+	static char* typeName() { return #scope"::"#className; }			\
+};
+
+#define TYPE_NAME(className)	className##typeNameWrap
+

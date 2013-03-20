@@ -34,6 +34,7 @@ namespace memmonitor
 		void OnMenuOpenProperty(wxCommandEvent& event);
 		void OnRefreshTimer(wxTimerEvent& event);
 		void OnKeyDown(wxKeyEvent& event);
+		void OnDestroy(wxWindowDestroyEvent &event);
 
 	protected:
 		enum { ID_TREE };

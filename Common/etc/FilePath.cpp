@@ -24,6 +24,7 @@ std::string common::GetFileNameExceptExt(const std::string &fileName)
 
 //------------------------------------------------------------------------
 // fileName에서 파일이름과 확장자를 제외한 나머지 경로를 리턴한다.
+// 마지막에 '\' 문자는 없다.
 //------------------------------------------------------------------------
 std::string common::GetFilePathExceptFileName(const std::string &fileName)
 {

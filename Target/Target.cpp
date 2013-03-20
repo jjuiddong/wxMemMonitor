@@ -46,9 +46,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_TARGET));
 
-	if (!memmonitor::Init( memmonitor::INNER_PROCESS, hInstance, "config_bounceball.json" ))
+	//if (!memmonitor::Init( memmonitor::INNER_PROCESS, hInstance, "config_bounceball.json" ))
+	if (!memmonitor::Init( memmonitor::INNER_PROCESS, hInstance, "config_madsoccer_server.json" ))
 	{
-		::MessageBoxA(NULL, memmonitor::GetLastError().c_str(), "ERROR", MB_OK);
+		MessageBoxA(NULL, memmonitor::GetLastError().c_str(), "ERROR", MB_OK);
 	}
 
 	// 기본 메시지 루프입니다.

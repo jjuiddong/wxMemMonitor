@@ -7,6 +7,25 @@
 //------------------------------------------------------------------------
 #pragma once
 
+namespace common
+{
+	template<class T>
+	static bool IsSameId(T *p, int id)
+	{
+		if (!p) return false;
+		return p->GetId() == id;
+	} 
+
+	template<class T>
+	static bool IsSameHandle(T *p, HANDLE handle)
+	{
+		if (!p) return false;
+		return p->GetHandle() == handle;
+	} 
+
+}
+
+
 /*
  치열한 고민의 현장이다. =,.=;;
 

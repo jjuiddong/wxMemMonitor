@@ -28,7 +28,6 @@ namespace memmonitor
 
 	protected:
 		void CreateMenuBar();
-		wxWindow* GetPane(const std::string &name);
 
 		// Event Handler
 		DECLARE_EVENT_TABLE()

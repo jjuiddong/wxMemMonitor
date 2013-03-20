@@ -20,7 +20,7 @@ namespace common
 		n_IsInitRand = true;
 		srand(timeGetTime());
 		for(int i=0; i < MAX_RAND_COUNT; ++i)
-			n_randNumber[ i] = i+1; // 랜덤값은 1번부터 시작한다.
+			n_randNumber[ i] = i+10; // 랜덤값은 10번부터 시작한다. (예약어 때문에)
 	}
 
 	//------------------------------------------------------------------------

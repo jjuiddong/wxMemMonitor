@@ -29,6 +29,9 @@ END_EVENT_TABLE()
 CFrame::CFrame(wxWindow* parent) : wxFrame(parent, -1, _("wxMemMonitor"),
 	wxDefaultPosition, wxSize(400,500),
 	wxDEFAULT_FRAME_STYLE)
+,	m_pMemTree(NULL)
+,	m_pLogWnd(NULL)
+,	m_pPropWnd(NULL)
 {
 	const bool IsInitSuccess = InitMemoryMonitor( GetConfigFileName() );
 
@@ -38,10 +41,6 @@ CFrame::CFrame(wxWindow* parent) : wxFrame(parent, -1, _("wxMemMonitor"),
 	CMemoryTree* memTree = new CMemoryTree(this);
 	CLogWindow *logWnd = new CLogWindow(this);
 	CPropertyWindow *propWnd = new CPropertyWindow(this);
-
-	//wxMiniFrame *pframe = new wxMiniFrame(this, -1, "mini");
-	//pframe->SetWindowStyle(wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX);
-	//pframe->Show();
 
 	// add the panes to the manager
 	m_mgr.AddPane(logWnd, wxBOTTOM, wxT("Log Window"));
@@ -56,7 +55,7 @@ CFrame::CFrame(wxWindow* parent) : wxFrame(parent, -1, _("wxMemMonitor"),
 	m_pMemTree = memTree;
 	m_pLogWnd = logWnd;
 	m_pPropWnd = propWnd;
-
+	
 	if (!IsInitSuccess)
 		GetLogWindow()->PrintText( GetLastError() );
 	//if (IsInitSuccess)
@@ -140,21 +139,6 @@ void CFrame::OnPropertyFrameClose(wxCloseEvent& event)
 			break;
 		}
 	}
-}
-
-
-//------------------------------------------------------------------------
-// 
-//------------------------------------------------------------------------
-wxWindow* CFrame::GetPane(const std::string &name)
-{
-	wxAuiPaneInfoArray allpanes = m_mgr.GetAllPanes();
-	for (size_t i=0; i < allpanes.size(); ++i)
-	{
-		if (allpanes[ i].caption == name)
-			return allpanes[ i].window;
-	}
-	return NULL;
 }
 
 

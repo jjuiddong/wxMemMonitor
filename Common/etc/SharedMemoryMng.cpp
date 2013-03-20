@@ -159,10 +159,10 @@ void* sharedmemory::AllocateAnonymous(const std::string &typeName, size_t size)
 //------------------------------------------------------------------------
 // 메모리를 반납한다.
 //------------------------------------------------------------------------
-void sharedmemory::DeAllocate(void *ptr)
+bool sharedmemory::DeAllocate(void *ptr)
 {
-	RET(!n_pSegment);
-	RET(!n_pMap);
+	RETV(!n_pSegment, false);
+	RETV(!n_pMap, false);
 
 	const managed_shared_memory::handle_t handle = n_pSegment->get_handle_from_address(ptr);
 
@@ -177,6 +177,7 @@ void sharedmemory::DeAllocate(void *ptr)
 		}
 		++it;
 	}
+	return true;
 }
 
 

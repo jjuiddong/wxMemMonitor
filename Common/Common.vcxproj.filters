@@ -10,13 +10,16 @@
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
     <Filter Include="Etc">
-      <UniqueIdentifier>{ac231ff8-a401-4554-8dd4-90b09095a4dd}</UniqueIdentifier>
+      <UniqueIdentifier>{1f410faa-ce12-45ff-ac59-168302650584}</UniqueIdentifier>
     </Filter>
     <Filter Include="Math">
-      <UniqueIdentifier>{25a397c7-9984-47cc-9788-88fbb5bd0d77}</UniqueIdentifier>
+      <UniqueIdentifier>{5b78d34f-31c4-4dd8-943f-91e174d2140e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Thread">
-      <UniqueIdentifier>{3f361ce5-bb9c-48cb-9c12-02f014cbd24a}</UniqueIdentifier>
+      <UniqueIdentifier>{db7d0166-087b-4147-b4bb-01d4b13f986d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Container">
+      <UniqueIdentifier>{ed834417-7dd4-4102-bad7-20768e9c3c82}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -186,6 +189,12 @@
     </ClInclude>
     <ClInclude Include="thread\Thread.h">
       <Filter>Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="container\VectorMap.h">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorHelper.h">
+      <Filter>Container</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

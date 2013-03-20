@@ -2,7 +2,7 @@
 #include "Thread.h"
 #include "Task.h"
 #include <process.h>
-
+#include <boost/bind.hpp>
 
 using namespace common;
 
@@ -12,6 +12,7 @@ namespace common
 	{
 		CThread *pThread = (CThread*)pThreadPtr;
 		pThread->Run();
+		pThread->Exit();
 		return 0;
 	}
 
@@ -21,8 +22,9 @@ namespace common
 CThread::CThread(const std::string &name) :
 	m_State(WAIT)
 ,	m_hThread(NULL)
-,	m_Name(name)
+//,	m_Name(name)
 {
+	strcpy_s(m_Name, name.c_str());
 	InitializeCriticalSection( &m_TaskCriticalSection );
 	InitializeCriticalSection( &m_MsgCriticalSection );
 
@@ -40,9 +42,11 @@ CThread::~CThread()
 //------------------------------------------------------------------------
 void CThread::Start()
 {
-	// 쓰레드 실행
-	m_State = RUN;
-	m_hThread = (HANDLE)_beginthreadex(NULL, 0, ThreadProcess, this, 0, NULL);
+	if (RUN != m_State)
+	{
+		m_State = RUN;
+		m_hThread = (HANDLE)_beginthreadex(NULL, 0, ThreadProcess, this, 0, NULL);
+	}
 }
 
 
@@ -62,10 +66,10 @@ void CThread::Terminate()
 // rcvTaskId : 받을 태스크 아이디 ('0' 이라면 쓰레드가 받는다.)
 //			   -1 : 외부로 가는 메세지를 뜻함
 //------------------------------------------------------------------------
-void CThread::Send2ThreadMessage( int rcvTaskId, int msg, WPARAM wParam, LPARAM lParam)
+void CThread::Send2ThreadMessage( threadmsg::MSG msg, WPARAM wParam, LPARAM lParam, LPARAM added)
 {
 	EnterMsgSync();
-	m_ThreadMsgs.push_back( SExternalMsg(rcvTaskId, msg, wParam, lParam) );
+	m_ThreadMsgs.push_back( SExternalMsg(-1, (int)msg, wParam, lParam, added) );
 	LeaveMsgSync();
 }
 
@@ -73,10 +77,10 @@ void CThread::Send2ThreadMessage( int rcvTaskId, int msg, WPARAM wParam, LPARAM 
 //------------------------------------------------------------------------
 // 
 //------------------------------------------------------------------------
-void CThread::Send2ExternalMessage( int msg, WPARAM wParam, LPARAM lParam )
+void CThread::Send2ExternalMessage( int msg, WPARAM wParam, LPARAM lParam, LPARAM added )
 {
 	EnterMsgSync();
-	m_ExternalMsgs.push_back( SExternalMsg(-1, msg, wParam, lParam) );
+	m_ExternalMsgs.push_back( SExternalMsg(-1, msg, wParam, lParam, added) );
 	LeaveMsgSync();
 }
 
@@ -249,6 +253,9 @@ void CThread::Run()
 {
 	while (RUN == m_State)
 	{
+		if (m_Tasks.empty()) // break no task
+			break;
+
 		//1. 태스크 처리
 		EnterTaskSync();
 		{
@@ -282,6 +289,15 @@ void CThread::Run()
 
 
 //------------------------------------------------------------------------
+// call exit thread
+//------------------------------------------------------------------------
+void	CThread::Exit()
+{
+	m_State = END;
+}
+
+
+//------------------------------------------------------------------------
 // 저장된 메세지들을 태스크로 보낸다.
 //------------------------------------------------------------------------
 void CThread::DispatchMessage()
@@ -291,25 +307,53 @@ void CThread::DispatchMessage()
 		ExternalMsgItor it = m_ThreadMsgs.begin();
 		while (m_ThreadMsgs.end() != it)
 		{
-			if (0 == it->rcvTaskId) // Thread에게 온 메세지
+			if (threadmsg::TASK_MSG == it->msg) // task message
 			{
-				MessageProc(it->msg, it->wParam, it->lParam);
-			}
-			else
-			{
-				TaskItor t = find_if(m_Tasks.begin(), m_Tasks.end(), IsTask(it->rcvTaskId));
+				TaskItor t = find_if(m_Tasks.begin(), m_Tasks.end(), 
+					boost::bind( &IsSameId<CTask>, _1, it->wParam) );
 				if (m_Tasks.end() != t)
 				{
-					(*t)->MessageProc(it->msg, it->wParam, it->lParam);
+					(*t)->MessageProc((threadmsg::MSG)it->msg, it->wParam, it->lParam, it->added);
 				}
 				else
 				{
 					// 목적지가 없는 메세지 error
 				}
 			}
+			else // Thread에게 온 메세지
+			{
+				MessageProc((threadmsg::MSG)it->msg, it->wParam, it->lParam, it->added);
+			}
 			++it;
 		}
 		m_ThreadMsgs.clear();
 	}
 	LeaveMsgSync();
+}
+
+
+//------------------------------------------------------------------------
+// Message Process
+//------------------------------------------------------------------------
+void	CThread::MessageProc( threadmsg::MSG msg, WPARAM wParam, LPARAM lParam, LPARAM added )
+{
+	switch (msg)
+	{
+	case threadmsg::TERMINATE_TASK:
+		{
+			// terminate task of id wParam
+			EnterTaskSync();
+			{
+				auto it = std::find_if( m_Tasks.begin(), m_Tasks.end(), 
+					bind( &IsSameId<common::CTask>, _1, (int)wParam) );
+				if (m_Tasks.end() != it)
+				{
+					delete *it;
+					m_Tasks.erase(it);
+				}
+			}
+			LeaveTaskSync();
+		}
+		break;
+	}
 }
