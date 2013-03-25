@@ -8,16 +8,17 @@
 #ifndef __VISUALIZERGLOBAL_H__
 #define __VISUALIZERGLOBAL_H__
 
+#include "../wxMemMonitor.h"
 
 struct IDiaSymbol;
 namespace visualizer
 {
-	using namespace sharedmemory;
+	using namespace memmonitor;
 
 	struct SSymbolInfo
 	{
 		IDiaSymbol *pSym;
-		SMemoryInfo mem;	
+		SMemInfo mem;	
 		bool isNotRelease; // defalut : false
 
 		SSymbolInfo() 
@@ -26,11 +27,11 @@ namespace visualizer
 			isNotRelease = false;
 		}
 		SSymbolInfo( const SSymbolInfo &rhs );
-		SSymbolInfo( IDiaSymbol *psym, const SMemoryInfo &_mem) 
+		SSymbolInfo( IDiaSymbol *psym, const SMemInfo &_mem) 
 			: pSym(psym), mem(_mem), isNotRelease(false)
 		{ 
 		}
-		SSymbolInfo( IDiaSymbol *psym, const SMemoryInfo &_mem, bool _isRelease) 
+		SSymbolInfo( IDiaSymbol *psym, const SMemInfo &_mem, bool _isRelease) 
 			: pSym(psym), mem(_mem), isNotRelease(!_isRelease)
 		{
 		}

@@ -29,7 +29,7 @@ namespace visualizer
 	// make property
 	bool	MakeVisualizerProperty( CPropertyWindow *pPropertiesWnd, 
 		wxPGProperty *pParentProp, 
-		const sharedmemory::SMemoryInfo &memInfo, const std::string &symbolName );
+		const SMemInfo &memInfo, const std::string &symbolName );
 
 	bool	MakeVisualizerProperty( CPropertyWindow *pPropertiesWnd, 
 		wxPGProperty *pParentProp, const SSymbolInfo &symbol );

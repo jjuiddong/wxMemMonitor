@@ -19,7 +19,7 @@ bool CApp::OnInit()
 		LPWSTR *szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
 		if (nArgs > 1)
 		{
-			configFileName = common::wstr2str(szArglist[ 1]);
+			configFileName = wstr2str(szArglist[ 1]);
 			SetConfigFileName( configFileName );
 		}
 	}

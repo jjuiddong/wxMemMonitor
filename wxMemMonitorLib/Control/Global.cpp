@@ -8,6 +8,7 @@
 #include "../visualizer/PropertyMaker.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include "../memory/SharedMemoryMng.h"
 
 
 namespace memmonitor
@@ -104,7 +105,7 @@ wxVariant memmonitor::Variant2wxVariant(const _variant_t &var)
 			//			std::string str;
 			//			packet  >>(str);
 			//#ifdef _UNICODE
-			//			varType.bstrVal = (_bstr_t)common::str2wstr(str).c_str();
+			//			varType.bstrVal = (_bstr_t)str2wstr(str).c_str();
 			//#else
 			//			varType.bstrVal = (_bstr_t)str.c_str();
 			//#endif
@@ -219,21 +220,26 @@ bool	memmonitor::InitMemoryMonitor(const std::string &configFileName)
 		if (!dia::CDiaWrapper::Get()->Init(pdbPath))
 		{
 			SetErrorMsg(
-				common::format("%s Pdb 파일이 없습니다.\n", pdbPath.c_str()) );
+				format("%s Pdb 파일이 없습니다.\n", pdbPath.c_str()) );
 			return false;
 		}
-		if (!sharedmemory::Init(shareMemoryName, sharedmemory::SHARED_CLIENT))
+
+		if (OUTER_PROCESS == GetExecuteType())
 		{
-			SetErrorMsg(
-				common::format("%s  이름의 공유메모리가 없습니다.\n", 
-				shareMemoryName.c_str()) );
-			return false;
+			if (!sharedmemory::Init(shareMemoryName, sharedmemory::SHARED_CLIENT))
+			{
+				SetErrorMsg(
+					format("%s  이름의 공유메모리가 없습니다.\n", 
+					shareMemoryName.c_str()) );
+				return false;
+			}
 		}
+
 	}
 	catch (std::exception &e)
 	{
 		SetErrorMsg(
-			common::format( "\"%s\" json script Err!! [%s]\n",  
+			format( "\"%s\" json script Err!! [%s]\n",  
 			configFileName.c_str(), e.what()) );
 		return false;
 	}
@@ -338,14 +344,14 @@ void memmonitor::WriteWindowPosition()
 
 		wxRect mainW = GetFrame()->GetRect();
 		props.add( "main window", 
-			common::format("%d %d %d %d", mainW.x, mainW.y, mainW.width, mainW.height) );
+			format("%d %d %d %d", mainW.x, mainW.y, mainW.width, mainW.height) );
 
 		const CFrame::PropertyFrames &frames = GetFrame()->GetPropFrames();
 		BOOST_FOREACH(auto &frame, frames)
 		{
 			string name = (const char*)frame->GetTitle();
 			wxRect r = frame->GetScreenRect();
-			props.add( name.c_str(), common::format("%d %d %d %d", r.x, r.y, r.width, r.height) );
+			props.add( name.c_str(), format("%d %d %d %d", r.x, r.y, r.width, r.height) );
 		}
 
 		boost::property_tree::write_json( "windowpos.json", props );
@@ -355,3 +361,4 @@ void memmonitor::WriteWindowPosition()
 		GetLogWindow()->PrintText( e.what() );
 	}
 }
+

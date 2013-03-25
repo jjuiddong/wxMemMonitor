@@ -7,6 +7,7 @@
 #include "../Control/Global.h"
 #include "../dia/DiaWrapper.h"
 #include "../visualizer/PropertyMaker.h"
+#include "../memory/SharedMemoryMng.h"
 
 
 using namespace memmonitor;
@@ -103,7 +104,7 @@ void CFrame::CreateMenuBar()
 //------------------------------------------------------------------------
 // add PropertyWindow
 //------------------------------------------------------------------------
-bool CFrame::AddPropertyWindow(const wxString &symbolName )
+bool CFrame::AddPropertyWindow( const wxString &symbolName )
 {
 	wxMiniFrame *pframe = new wxMiniFrame(this, -1, symbolName);
 	pframe->SetWindowStyle(wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX);

@@ -16,8 +16,52 @@
 /////////////////////////////////////////////////////////
 #define ASSERT( x )		assert( (x) )
 
+
+#ifndef SAFE_DELETE
+#define SAFE_DELETE(p) {if (p) { delete p; p=NULL;} }
+#endif
+#ifndef SAFE_DELETEA
+#define SAFE_DELETEA(p) {if (p) { delete[] p; p=NULL;} }
+#endif
+#ifndef SAFE_RELEASE
+#define SAFE_RELEASE(p) {if (p) { p->Release(); p=NULL;} }
+#endif
+
+#ifndef IN
+#define IN
+#endif
+
+#ifndef OUT
+#define OUT
+#endif
+
+#ifndef INOUT
+#define INOUT
+#endif
+
+#define RET(exp)		{if((exp)) return; }			// exp가 true이면 리턴
+#define RETV(exp,val)	{if((exp)) return val; }
+#define ASSERT_RET(exp)		{assert(exp); RET(!(exp) ); }
+#define ASSERT_RETV(exp,val)		{assert(exp); RETV(!(exp),val ); }
+
+
+#include <list>
+#include <map>
+#include <vector>
+#include <algorithm>
+#include <string>
+#include <sstream>
+#include <fstream>
 #include "dia2.h"
 #include <atlbase.h>
+#include <comutil.h>
+#include <algorithm>
+#include <comdef.h> // for _variant_t
+#include <boost/foreach.hpp>
+
+#pragma warning(disable: 4355) // disable warning, using this pointer in constructor 
+
+#define  BOOST_DATE_TIME_NO_LIB // boost/interprocess
 
 #undef wxUSE_CMDLINE_PARSER
 
@@ -26,7 +70,11 @@
 	#include "wx/wx.h"
 #endif
 
-#include "../Common/Common.h"
+#include "common/String.h"
+#include "common/Time.h"
+#include "common/Log.h"
+#include "common/Reference.h"
+#include "common/Singleton.h"
 
 
 namespace memmonitor
@@ -36,10 +84,10 @@ namespace memmonitor
 	class CPropertyWindow;
 	class CFrame;
 
-	typedef common::ReferencePtr<CMemoryTree> MemTreePtr;
-	typedef common::ReferencePtr<CLogWindow> LogWindowPtr;
-	typedef common::ReferencePtr<CPropertyWindow> PropWindowPtr;
-	typedef common::ReferencePtr<CFrame> FramePtr;
+	typedef ReferencePtr<CMemoryTree> MemTreePtr;
+	typedef ReferencePtr<CLogWindow> LogWindowPtr;
+	typedef ReferencePtr<CPropertyWindow> PropWindowPtr;
+	typedef ReferencePtr<CFrame> FramePtr;
 
 }
 

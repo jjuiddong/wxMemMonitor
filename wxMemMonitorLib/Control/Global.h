@@ -41,4 +41,5 @@ namespace memmonitor
 	_variant_t				wxVariant2Variant(const wxVariant &wxVar);
 	_variant_t				wxVariant2Variant(const VARTYPE &vartype, const wxVariant &wxVar);
 
+
 }

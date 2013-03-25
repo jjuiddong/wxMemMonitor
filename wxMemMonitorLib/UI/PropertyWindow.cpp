@@ -71,7 +71,7 @@ void CPropertyWindow::UpdateSymbol( const wxString &symbolName )
 	ClearPropItem();
 
 	std::string tmpStr = symbolName;
-	std::string str = sharedmemory::ParseObjectName(tmpStr);
+	std::string str = ParseObjectName(tmpStr);
 	const bool result = visualizer::MakeProperty_DefaultForm(this, tmpStr);
 
 	// root node expand
@@ -96,7 +96,7 @@ void CPropertyWindow::UpdateSymbol( const wxString &symbolName )
 void CPropertyWindow::CheckSymbol( const wxString &symbolName )
 {
 	std::string tmpStr = symbolName;
-	std::string str = sharedmemory::ParseObjectName(tmpStr);
+	std::string str = ParseObjectName(tmpStr);
 
 	CComPtr<IDiaSymbol> pSymbol = CDiaWrapper::Get()->FindType(str);
 	if (!pSymbol)
@@ -107,8 +107,8 @@ void CPropertyWindow::CheckSymbol( const wxString &symbolName )
 		return;
 	}
 
-	sharedmemory::SMemoryInfo memInfo;
-	if (!sharedmemory::FindMemoryInfo(tmpStr, memInfo))
+	SMemInfo memInfo;
+	if (!FindMemoryInfo(tmpStr, memInfo))
 	{
 		GetLogWindow()->PrintText( 
 			"공유메모리에 " + tmpStr + " 타입의 정보가 없습니다.\n" );
@@ -250,18 +250,18 @@ bool	CPropertyWindow::FindSymbolUpward( wxPGProperty *pProp, OUT SSymbolInfo *pO
 		if (retry)
 		{
 			// 찾기를 실패했다면, 현재 노드에서 찾기를 시도한다.
-			const string typeName = sharedmemory::ParseObjectName(searchName);
+			const string typeName = ParseObjectName(searchName);
 			pOut->pSym = CDiaWrapper::Get()->FindType( typeName );
 			RETV(!pOut->pSym, false);
-			pOut->mem = SMemoryInfo(pItemData->typeName.c_str(), pItemData->typeData.ptr, 0);
+			pOut->mem = SMemInfo(pItemData->typeName.c_str(), pItemData->typeData.ptr, 0);
 		}
 	}
 	else
 	{
-		const string typeName = sharedmemory::ParseObjectName(searchName);
+		const string typeName = ParseObjectName(searchName);
 		pOut->pSym = CDiaWrapper::Get()->FindType( typeName );
 		RETV(!pOut->pSym, false);
-		pOut->mem = SMemoryInfo(pItemData->typeName.c_str(), pItemData->typeData.ptr, 0); 
+		pOut->mem = SMemInfo(pItemData->typeName.c_str(), pItemData->typeData.ptr, 0); 
 	}
 
 	return true;

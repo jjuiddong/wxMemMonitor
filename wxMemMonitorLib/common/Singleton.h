@@ -7,7 +7,7 @@
 //------------------------------------------------------------------------
 #pragma once
 
-namespace common
+namespace memmonitor
 {
 	template <class T>
 	class CSingleton

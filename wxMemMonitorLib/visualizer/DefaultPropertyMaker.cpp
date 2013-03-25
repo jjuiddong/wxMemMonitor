@@ -6,11 +6,11 @@
 #include "../ui/PropertyWindow.h"
 #include "../ui/PropertyItemAdapter.h"
 #include "VisualizerDefine.h"
+#include <boost/interprocess/streams/bufferstream.hpp>
 
 
 namespace visualizer
 {
-	using namespace sharedmemory;
 	using namespace parser;
 
 	CPropertyWindow *g_pProperty = NULL;
@@ -63,13 +63,13 @@ using namespace memmonitor;
 //------------------------------------------------------------------------
 bool visualizer::MakeProperty_DefaultForm( CPropertyWindow *pProperties,  const string &symbolName )
 {
-	const std::string str = sharedmemory::ParseObjectName(symbolName);
+	const std::string str = ParseObjectName(symbolName);
 
 	IDiaSymbol *pSymbol = CDiaWrapper::Get()->FindType(str);
 	RETV(!pSymbol, false);
 
-	sharedmemory::SMemoryInfo memInfo;
-	if (!sharedmemory::FindMemoryInfo(symbolName, memInfo))
+	SMemInfo memInfo;
+	if (!FindMemoryInfo(symbolName, memInfo))
 	{
 		pSymbol->Release();
 		return false;
@@ -232,7 +232,7 @@ void	visualizer ::MakeProperty_BaseClass(wxPGProperty *pParentProp,
 	LocationType locType;
 	const LONG offset = dia::GetSymbolLocation(symbol.pSym, &locType);
 	BYTE *ptr = (BYTE*)symbol.mem.ptr + offset;
-	SMemoryInfo newMemInfo(symbol.mem.name.c_str(), ptr, 0);
+	SMemInfo newMemInfo(symbol.mem.name.c_str(), ptr, 0);
 	MakeProperty_Child(pParentProp, SSymbolInfo(pBaseType, newMemInfo), depth);
 }
 
@@ -266,7 +266,7 @@ void visualizer ::MakeProperty_UDTChild(wxPGProperty *pParentProp,
 			while (SUCCEEDED(pEnumChildren->Next(1, &pChild, &celt)) && (celt == 1)) 
 			{
 				LONG offset = dia::GetSymbolLocation(pChild);
-				SMemoryInfo memberMemInfo;
+				SMemInfo memberMemInfo;
 				memberMemInfo.name = dia::GetSymbolName(pChild);
 				memberMemInfo.ptr = (BYTE*)symbol.mem.ptr + offset;
 				MakeProperty_Root(pParentProp, SSymbolInfo(pChild, memberMemInfo), depth-1);
@@ -292,14 +292,14 @@ void	visualizer ::MakeProperty_Pointer(wxPGProperty *pParentProp, const SSymbolI
 	hr = pBaseType->get_symTag((DWORD*)&baseSymTag);
 
 	void *srcPtr = (void*)*(DWORD*)symbol.mem.ptr;
-	void *newPtr = sharedmemory::MemoryMapping(srcPtr);
+	void *newPtr = MemoryMapping(srcPtr);
 
 	wxPGProperty *pProp = NULL;
 	if (SymTagUDT == baseSymTag)
 	{
 		if (newPtr) 
 		{
-			SMemoryInfo ptrMemInfo(symbol.mem.name.c_str(), newPtr, (size_t)0);
+			SMemInfo ptrMemInfo(symbol.mem.name.c_str(), newPtr, (size_t)0);
 			MakeProperty_Root(pParentProp, SSymbolInfo(pBaseType, ptrMemInfo, false), depth);
 		}
 	}
@@ -427,7 +427,6 @@ wxPGProperty* visualizer::MakeProperty_ArrayData(wxPGProperty *pParentProp,
 		ss << symbol.mem.name << " (" << typeName << ")";
 	}
 
-	//pProp = new CPropertyGrid( common::str2wstr(ss.str()).c_str() ); 
 	CPropertyItemAdapter prop( ss.str() );
 	//pProp->SetValue( wxVariant(ss.str(), ss.str()) );
 	AddProperty(pParentProp, prop.GetProperty(), &symbol,  &STypeData(SymTagArrayType, VT_EMPTY, NULL) );
@@ -453,7 +452,7 @@ wxPGProperty* visualizer::MakeProperty_PointerData(
 	ASSERT_RETV(hr == S_OK, pProp);  // BasicDataType or UDTDataType
 
 	void *srcPtr = (void*)*(DWORD*)symbol.mem.ptr;
-	void *newPtr = sharedmemory::MemoryMapping(srcPtr);
+	void *newPtr = MemoryMapping(srcPtr);
 	if (!newPtr)
 		newPtr = srcPtr; // 공유메모리에 없는 데이타일경우 주소만 출력한다.
 
@@ -467,7 +466,7 @@ wxPGProperty* visualizer::MakeProperty_PointerData(
 	if (SymTagUDT == baseSymTag)
 	{
 		ss << symbol.mem.name << " 0x" << newPtr;
-		ss << (char*)(sharedmemory::CheckValidAddress(newPtr)? " " : " not shared memory");
+		ss << (char*)(CheckValidAddress(newPtr)? " " : " not shared memory");
 		ss << " (" << typeName << ")";
 	}
 	else if (SymTagBaseType == baseSymTag)
@@ -480,14 +479,14 @@ wxPGProperty* visualizer::MakeProperty_PointerData(
 		if (btChar == btype)
 		{
 			ss << symbol.mem.name << " 0x" << newPtr << " {\"";
-			ss << (char*)(sharedmemory::CheckValidAddress(newPtr)? newPtr : " not shared memory")  << "\"}";
+			ss << (char*)(CheckValidAddress(newPtr)? newPtr : " not shared memory")  << "\"}";
 		}
 	}
 
 	if (ss.str().empty()) // default pointer 작업
 	{
 		ss << symbol.mem.name << " 0x" << newPtr;
-		ss << (char*)(sharedmemory::CheckValidAddress(newPtr)? " " : " not shared memory");
+		ss << (char*)(CheckValidAddress(newPtr)? " " : " not shared memory");
 		ss << " (" << typeName << ")";
 	}
 
@@ -545,6 +544,7 @@ void visualizer ::MakeProperty_Array(wxPGProperty *pParentProp, const SSymbolInf
 	ASSERT(S_OK == hr);
 
 	char valueName[ 128];
+	using boost::interprocess::basic_bufferstream;
 	basic_bufferstream<char> formatter(valueName, sizeof(valueName));
 
 	if (//SymTagData == elemSymTag ||
@@ -556,7 +556,7 @@ void visualizer ::MakeProperty_Array(wxPGProperty *pParentProp, const SSymbolInf
 			formatter << "[" << i / element_length << "]" << std::ends;
 
 			void *ptr = (BYTE*)symbol.mem.ptr + i;
-			SMemoryInfo arrayElem(valueName, ptr, (size_t)element_length);
+			SMemInfo arrayElem(valueName, ptr, (size_t)element_length);
 			MakeProperty_BaseType(pParentProp, valueName, SSymbolInfo(pElementType, arrayElem, false));
 		}
 		//pParentProp->Expand(FALSE); // 일단 접어놓는다.
@@ -570,11 +570,10 @@ void visualizer ::MakeProperty_Array(wxPGProperty *pParentProp, const SSymbolInf
 			formatter << "[" << i / element_length << "]" << std::ends;
 
 			void *ptr = (BYTE*)symbol.mem.ptr + i;
-			SMemoryInfo arrayElem(valueName, ptr, (size_t)element_length);
+			SMemInfo arrayElem(valueName, ptr, (size_t)element_length);
 			SSymbolInfo arraySymbol(pElementType, arrayElem, false);
 
  			CPropertyItemAdapter prop( valueName );
- 		//		new CPropertyGrid( common::str2wstr(valueName).c_str() );
 			AddProperty( pParentProp, prop.GetProperty(), &arraySymbol, &STypeData(SymTagUDT,VT_EMPTY,NULL));
 
 			MakeProperty_Root(prop.GetProperty(), arraySymbol, depth);

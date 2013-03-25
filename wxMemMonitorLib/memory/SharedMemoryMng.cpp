@@ -200,19 +200,6 @@ void sharedmemory::EnumerateMemoryInfo(OUT MemoryList &memList)
 
 
 //------------------------------------------------------------------------
-// TypeName%Count 형태로 되어있는 타입이름을 TypeName만 리턴하게 한다.
-//------------------------------------------------------------------------
-std::string sharedmemory::ParseObjectName(const std::string &objectName)
-{
-	const int offset = objectName.find('#');
-	if (std::string::npos == offset)
-		return objectName;
-	else
-		return objectName.substr(0,offset);
-}
-
-
-//------------------------------------------------------------------------
 // name에 해당하는 정보를 공유메모리에서 찾아서 리턴한다.
 //------------------------------------------------------------------------
 bool sharedmemory::FindMemoryInfo(const std::string &name, OUT SMemoryInfo &info)

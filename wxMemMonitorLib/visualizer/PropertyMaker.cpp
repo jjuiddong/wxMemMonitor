@@ -2,16 +2,13 @@
 #include "stdafx.h"
 #include "PropertyMaker.h"
 #include "VisualizerParser.h"
-//#include "Variant.h"
 #include "../Dia/DiaWrapper.h"
 #include "DefaultPropertyMaker.h"
-//#include "VisualizerGlobal.h"
 #include <atlcomcli.h>
 
 namespace visualizer
 {
 	using namespace parser;
-	using namespace sharedmemory;
 
 	SVisualizerScript* FindVisualizer( const std::string &typeName );
 
@@ -68,7 +65,7 @@ using namespace visualizer;
 
 visualizer::parser::SVisualizerScript *m_pVisScr = NULL;
 std::string m_SymbolName;
-sharedmemory::SMemoryInfo m_MemInfo;
+SMemInfo m_MemInfo;
 CPropertyWindow *m_pPropertiesCtrl= NULL;
 wxPGProperty *m_pParentProperty = NULL;
 
@@ -107,9 +104,9 @@ void visualizer::Release()
 //------------------------------------------------------------------------
 bool	visualizer::MakeVisualizerProperty( CPropertyWindow *pPropertiesWnd, 
 											   wxPGProperty *pParentProp, 
-											   const SMemoryInfo &memInfo, const string &symbolName )
+											   const SMemInfo &memInfo, const string &symbolName )
 {
-	const std::string str = sharedmemory::ParseObjectName(symbolName);
+	const std::string str = ParseObjectName(symbolName);
 	SVisualizerScript *pVisScript = FindVisualizer(str);
 	if (pVisScript)
 	{
@@ -125,10 +122,10 @@ bool	visualizer::MakeVisualizerProperty( CPropertyWindow *pPropertiesWnd,
 		{
 			if (VisualizerScript_Visualizer == pVisScript->kind)
 				MakeProperty_Visualizer(pVisScript->vis, 
-					SSymbolInfo(pSymbol, SMemoryInfo(symbolName.c_str(), memInfo.ptr,0)));
+					SSymbolInfo(pSymbol, SMemInfo(symbolName.c_str(), memInfo.ptr,0)));
 			else 
 				MakeProperty_AutoExpand(pVisScript->autoexp, 
-					SSymbolInfo(pSymbol, SMemoryInfo(symbolName.c_str(), memInfo.ptr,0)));
+					SSymbolInfo(pSymbol, SMemInfo(symbolName.c_str(), memInfo.ptr,0)));
 		}
 		catch (VisualizerScriptError &)
 		{
@@ -681,7 +678,7 @@ bool visualizer::Find_Variable( SExpression *pexp,
 			{
 				pOut->isNotRelease = true; // symbol의 복사본이므로 release해선 안됨
 				pOut->pSym = symbol.pSym;
-				pOut->mem = SMemoryInfo( m_SymbolName.c_str(), m_MemInfo.ptr, 0 );
+				pOut->mem = SMemInfo( m_SymbolName.c_str(), m_MemInfo.ptr, 0 );
 				reval = true;
 			}
 		}
@@ -748,11 +745,11 @@ bool visualizer::Find_ChildSymbol(  const std::string findSymbolName,
 			ASSERT_RETV(hr == S_OK, false);
 
 			void *srcPtr = (void*)*(DWORD*)symbol.mem.ptr;
-			void *newPtr = sharedmemory::MemoryMapping(srcPtr);
+			void *newPtr = MemoryMapping(srcPtr);
 			if (newPtr) //공유메모리에서 벗어나면 newPtr은 NULL이된다.
 			{
 					return Find_ChildSymbol( findSymbolName,
-						SSymbolInfo(pNewSymbol, SMemoryInfo(symbol.mem.name.c_str(), newPtr, 0)),
+						SSymbolInfo(pNewSymbol, SMemInfo(symbol.mem.name.c_str(), newPtr, 0)),
 						pOut);
 			}
 		}

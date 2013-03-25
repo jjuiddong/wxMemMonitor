@@ -2,24 +2,35 @@
 //
 
 #include "stdafx.h"
+#include <math.h>
+#include <vector>
 #include "Target.h"
+#include "Ball.h"
 
 #include "../wxMemMonitorLib/wxMemMonitor.h"
 MEMORYMONITOR_INNER_PROCESS();
+
 
 
 #define MAX_LOADSTRING 100
 
 // 전역 변수:
 HINSTANCE hInst;								// 현재 인스턴스입니다.
+HWND g_hWnd;
 TCHAR szTitle[MAX_LOADSTRING];					// 제목 표시줄 텍스트입니다.
 TCHAR szWindowClass[MAX_LOADSTRING];			// 기본 창 클래스 이름입니다.
+
+std::vector<CBall*> m_Balls;
+const int MAX_BALL_COUNT = 30;
+const int DEFAULT_RADIUS = 10;
 
 // 이 코드 모듈에 들어 있는 함수의 정방향 선언입니다.
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
+void					MainLoop(int elapse_time);
+void					Render(HWND hWnd);
+void					Paint(HWND hWnd, HDC hdc);
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -47,12 +58,20 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_TARGET));
 
 	//if (!memmonitor::Init( memmonitor::INNER_PROCESS, hInstance, "config_bounceball.json" ))
-	if (!memmonitor::Init( memmonitor::INNER_PROCESS, hInstance, "config_madsoccer_server.json" ))
+	//if (!memmonitor::Init( memmonitor::INNER_PROCESS, hInstance, "config_madsoccer_server.json" ))
+	if (!memmonitor::Init( memmonitor::INNER_PROCESS, hInstance, "config_target.json" ))
 	{
 		MessageBoxA(NULL, memmonitor::GetLastError().c_str(), "ERROR", MB_OK);
 	}
 
+	for (int i=0; i < MAX_BALL_COUNT; ++i)
+	{
+		POINT pt = {(i+1)*30, (i+1)*30};
+		m_Balls.push_back( new CBall( pt, DEFAULT_RADIUS ));
+	}
+
 	// 기본 메시지 루프입니다.
+	int oldT = GetTickCount();
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
 		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
@@ -61,27 +80,20 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 		memmonitor::Loop(msg);
+
+		const int curT = GetTickCount();
+		const int elapseT = min(curT - oldT, 100);
+		oldT = curT;
+		MainLoop(elapseT);	
 	}
 
+	for (int i=0; i < MAX_BALL_COUNT; ++i)
+		delete m_Balls[ i];
 	memmonitor::Cleanup();
 	return (int) msg.wParam;
 }
 
 
-
-//
-//  함수: MyRegisterClass()
-//
-//  목적: 창 클래스를 등록합니다.
-//
-//  설명:
-//
-//    Windows 95에서 추가된 'RegisterClassEx' 함수보다 먼저
-//    해당 코드가 Win32 시스템과 호환되도록
-//    하려는 경우에만 이 함수를 사용합니다. 이 함수를 호출해야
-//    해당 응용 프로그램에 연결된
-//    '올바른 형식의' 작은 아이콘을 가져올 수 있습니다.
-//
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
 	WNDCLASSEX wcex;
@@ -103,16 +115,6 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	return RegisterClassEx(&wcex);
 }
 
-//
-//   함수: InitInstance(HINSTANCE, int)
-//
-//   목적: 인스턴스 핸들을 저장하고 주 창을 만듭니다.
-//
-//   설명:
-//
-//        이 함수를 통해 인스턴스 핸들을 전역 변수에 저장하고
-//        주 프로그램 창을 만든 다음 표시합니다.
-//
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    HWND hWnd;
@@ -121,6 +123,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, 400, 400, NULL, NULL, hInstance, NULL);
+   g_hWnd = hWnd;
 
    if (!hWnd)
    {
@@ -133,16 +136,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    return TRUE;
 }
 
-//
-//  함수: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  목적: 주 창의 메시지를 처리합니다.
-//
-//  WM_COMMAND	- 응용 프로그램 메뉴를 처리합니다.
-//  WM_PAINT	- 주 창을 그립니다.
-//  WM_DESTROY	- 종료 메시지를 게시하고 반환합니다.
-//
-//
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int wmId, wmEvent;
@@ -157,9 +150,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// 메뉴 선택을 구문 분석합니다.
 		switch (wmId)
 		{
-		case IDM_ABOUT:
-			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-			break;
 		case IDM_EXIT:
 			DestroyWindow(hWnd);
 			break;
@@ -169,9 +159,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
-		// TODO: 여기에 그리기 코드를 추가합니다.
+		Paint(hWnd, ps.hdc);
 		EndPaint(hWnd, &ps);
 		break;
+	case WM_ERASEBKGND:
+		return 1;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
@@ -181,22 +173,57 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-// 정보 대화 상자의 메시지 처리기입니다.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(lParam);
-	switch (message)
-	{
-	case WM_INITDIALOG:
-		return (INT_PTR)TRUE;
 
-	case WM_COMMAND:
-		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-		{
-			EndDialog(hDlg, LOWORD(wParam));
-			return (INT_PTR)TRUE;
-		}
-		break;
+/**
+ @brief 
+ */
+void	MainLoop(int elapse_time)
+{
+	// Move
+	RECT cr;
+	::GetClientRect(g_hWnd, &cr);
+	for (size_t i=0; i < m_Balls.size(); ++i)
+		m_Balls[ i]->Move( cr, m_Balls, elapse_time );
+
+	// Render
+	Render(g_hWnd);
+	::InvalidateRect(g_hWnd, NULL, TRUE);
+}
+
+
+/**
+ @brief 
+ */
+void	Render(HWND hWnd)
+{
+	HDC hdc = GetDC(hWnd);
+	Paint(hWnd, hdc);
+	::ReleaseDC(hWnd, hdc);
+}
+
+
+/**
+ @brief 
+ */
+void Paint(HWND hWnd, HDC hdc)
+{
+	RECT rc;
+	GetClientRect(hWnd, &rc);
+	HDC hdcMem = CreateCompatibleDC(hdc);
+	HBITMAP hbmMem = CreateCompatibleBitmap(hdc, rc.right-rc.left, rc.bottom-rc.top);
+	HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, hbmMem);
+	HBRUSH hbrBkGnd = CreateSolidBrush(GetSysColor(COLOR_WINDOW));
+	FillRect(hdcMem, &rc, hbrBkGnd);
+	DeleteObject(hbrBkGnd);
+
+	for(size_t i=0; i < m_Balls.size(); ++i)
+	{
+		RECT r = m_Balls[ i]->GetRect();
+		::Ellipse(hdcMem,  r.left, r.top, r.right, r.bottom);
 	}
-	return (INT_PTR)FALSE;
+
+	BitBlt(hdc, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, hdcMem, 0, 0, SRCCOPY);
+	SelectObject(hdcMem, hbmOld);
+	DeleteObject(hbmMem);
+	DeleteDC(hdcMem);
 }

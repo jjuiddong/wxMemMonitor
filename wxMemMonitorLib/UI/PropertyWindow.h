@@ -19,7 +19,7 @@ namespace memmonitor
 	{
 		enum  {
 			MENU_OPEN_PROPERTY=500,
-			ID_REFRESH_TIMER,
+			ID_REFRESH_TIMER = 100,
 			REFRESH_INTERVAL = 1000,
 		};
 

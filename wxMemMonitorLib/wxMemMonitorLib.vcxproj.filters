@@ -27,6 +27,9 @@
     <Filter Include="Src\memory">
       <UniqueIdentifier>{a6f8e518-28bc-46cf-af4d-9c1b85125ec5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\common">
+      <UniqueIdentifier>{1f7de2bf-be45-4580-bc3f-e5dd7f8e075f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -74,6 +77,36 @@
     </ClInclude>
     <ClInclude Include="UI\PropertyItemAdapter.h">
       <Filter>Src\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\SharedMemoryContainer.h">
+      <Filter>Src\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\SharedMemoryList.h">
+      <Filter>Src\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\SharedMemoryMng.h">
+      <Filter>Src\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\SharedMemoryString.h">
+      <Filter>Src\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\SharedMemory.h">
+      <Filter>Src\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="common\Log.h">
+      <Filter>Src\common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\String.h">
+      <Filter>Src\common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\Time.h">
+      <Filter>Src\common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\Reference.h">
+      <Filter>Src\common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\Singleton.h">
+      <Filter>Src\common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +160,18 @@
     </ClCompile>
     <ClCompile Include="memory\allocmemory.cpp">
       <Filter>Src\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\SharedMemoryMng.cpp">
+      <Filter>Src\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\SharedMemoryString.cpp">
+      <Filter>Src\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="common\Log.cpp">
+      <Filter>Src\common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\String.cpp">
+      <Filter>Src\common</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

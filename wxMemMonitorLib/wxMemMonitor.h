@@ -13,6 +13,8 @@
 #pragma warning (disable: 4996)	// strcpy 경고 제거
 
 #include <list>
+#include <string>
+#include <sstream>
 #include "wx/wxprec.h"
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
@@ -68,7 +70,7 @@ namespace memmonitor
 
 
 	void*	Allocate(const std::string &name, size_t size);
-	bool		DeAllocate(void *ptr);
+	bool		DeAllocateMem(void *ptr);
 	void		EnumerateMemoryInfo(OUT MemoryList &memList);	
 	bool		FindMemoryInfo(const std::string &name, OUT SMemInfo &info);
 	void*	MemoryMapping(void *srcPtr );
@@ -111,19 +113,19 @@ namespace memmonitor
 
 		void operator delete (void *ptr)
 		{
-			DeAllocate(ptr);
+			DeAllocateMem(ptr);
 		}
 		void operator delete (void *ptr, char* lpszFileName, int nLine)
 		{
-			DeAllocate(ptr);
+			DeAllocateMem(ptr);
 		}
 		void operator delete (void *ptr, char *attachTypeName)
 		{
-			DeAllocate(ptr);
+			DeAllocateMem(ptr);
 		}
 		void operator delete[] (void *ptr)
 		{
-			DeAllocate(ptr);
+			DeAllocateMem(ptr);
 		}
 
 	private:
@@ -134,7 +136,7 @@ namespace memmonitor
 			if (attachTypeName)
 				ss << attachTypeName;
 			ss << ++m_Count;
-			return Allocate(ss.str(), size);
+			return memmonitor::Allocate(ss.str(), size);
 		}
 
 		static int m_Count;
@@ -155,8 +157,10 @@ namespace memmonitor
 	class CApp : public wxApp
 	{
 	public:
+		CApp();
 		virtual bool OnInit();
 		virtual void ExitMainLoop();
+		void OnTerminate(wxThreadEvent& event);
 	};
 
 }

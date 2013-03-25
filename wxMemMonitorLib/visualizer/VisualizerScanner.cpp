@@ -5,30 +5,36 @@
 using namespace visualizer;
 using namespace visualizer::parser;
 
-// lookup table of reserved words
-typedef struct _SReservedWord
+namespace visualizer
 {
-	char *str;
-	Tokentype tok;
-} SReservedWord;
+	Tokentype reservedLookup( char *s );
 
-SReservedWord reservedWords[] =
-{
-	{"#if", IF },
-	{"#elif", IF },
-	{"#else", ELSE },
-	{"#array", ARRAY },
-	{"#list", LIST },
-	{"#tree", TREE},
-	{"children", CHILDREN},
-	{"preview", PREVIEW},
-	{"stringview", STRINGVIEW},
-	{"#", SHARP_BRACKET}, // 가장 낮은 우선순위로 검색해야한다.
+	// lookup table of reserved words
+	typedef struct _SReservedWord
+	{
+		char *str;
+		Tokentype tok;
+	} SReservedWord;
 
-};
-const int g_rsvSize = sizeof(reservedWords) / sizeof(SReservedWord);
+	SReservedWord reservedWords[] =
+	{
+		{"#if", IF },
+		{"#elif", IF },
+		{"#else", ELSE },
+		{"#array", ARRAY },
+		{"#list", LIST },
+		{"#tree", TREE},
+		{"children", CHILDREN},
+		{"preview", PREVIEW},
+		{"stringview", STRINGVIEW},
+		{"#", SHARP_BRACKET}, // 가장 낮은 우선순위로 검색해야한다.
 
-static Tokentype reservedLookup( char *s )
+	};
+	const int g_rsvSize = sizeof(reservedWords) / sizeof(SReservedWord);
+
+}
+
+Tokentype visualizer::reservedLookup( char *s )
 {
 	int i=0;
 	for( i=0; i < g_rsvSize; ++i )

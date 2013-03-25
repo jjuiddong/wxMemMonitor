@@ -2,15 +2,12 @@
 #include "stdafx.h"
 #include "String.h"
 
-
-using namespace common;
-
-
+using namespace memmonitor;
 
 //------------------------------------------------------------------------
 // 유니코드를 멀티바이트 문자로 변환
 //------------------------------------------------------------------------
-std::string common::wstr2str(const std::wstring &wstr)
+std::string memmonitor::wstr2str(const std::wstring &wstr)
 {
 // 	std::locale const& loc = std::locale();
 // 	typedef std::codecvt<wchar_t, char, std::mbstate_t> codecvt_t;
@@ -37,7 +34,7 @@ std::string common::wstr2str(const std::wstring &wstr)
 //------------------------------------------------------------------------
 // 멀티바이트 문자를 유니코드로 변환
 //------------------------------------------------------------------------
-std::wstring common::str2wstr(const std::string &str)
+std::wstring memmonitor::str2wstr(const std::string &str)
 {
 // 	std::locale const& loc = std::locale();
 // 	typedef std::codecvt<wchar_t, char, std::mbstate_t> codecvt_t;
@@ -65,7 +62,7 @@ std::wstring common::str2wstr(const std::string &str)
 //------------------------------------------------------------------------
 // _variant_t 타입을 스트링으로 변환시킨다. 데이타 출력용을 만들어졌다.
 //------------------------------------------------------------------------
-std::string common::variant2str(const _variant_t &var)
+std::string memmonitor::variant2str(const _variant_t &var)
 {
 	std::stringstream ss;
 	switch (var.vt)
@@ -77,10 +74,11 @@ std::string common::variant2str(const _variant_t &var)
 
 	case VT_BSTR:
 		{
-			tstring str = (LPCTSTR) (_bstr_t)var.bstrVal;
 #ifdef _UNICODE
-			ss << common::wstr2str(str);
+			std::wstring str = (LPCTSTR) (_bstr_t)var.bstrVal;
+			ss << wstr2str(str);
 #else
+			string str = (LPCTSTR) (_bstr_t)var.bstrVal;
 			ss << str;
 #endif
 		}
@@ -106,7 +104,7 @@ std::string common::variant2str(const _variant_t &var)
 //------------------------------------------------------------------------
 // string을 varType 형태로 변환해서 리턴한다.
 //------------------------------------------------------------------------
-_variant_t common::str2variant(const _variant_t &varType, const std::string &value)
+_variant_t memmonitor::str2variant(const _variant_t &varType, const std::string &value)
 {
 	_variant_t var = varType;
 	switch (varType.vt)
@@ -119,7 +117,7 @@ _variant_t common::str2variant(const _variant_t &varType, const std::string &val
 	case VT_BSTR:
 		{
 #ifdef _UNICODE
-			var.bstrVal = (_bstr_t)common::str2wstr(value).c_str();
+			var.bstrVal = (_bstr_t)memmonitor::str2wstr(value).c_str();
 #else
 			var.bstrVal = (_bstr_t)value.c_str();
 #endif
@@ -145,7 +143,7 @@ _variant_t common::str2variant(const _variant_t &varType, const std::string &val
 //------------------------------------------------------------------------
 // 스트링포맷
 //------------------------------------------------------------------------
-std::string common::format(const char* fmt, ...)
+std::string memmonitor::format(const char* fmt, ...)
 {
 	char textString[ 256] = {'\0'};
 	va_list args;
@@ -159,7 +157,7 @@ std::string common::format(const char* fmt, ...)
 //------------------------------------------------------------------------
 // 스트링포맷 wstring 용
 //------------------------------------------------------------------------
-std::wstring common::formatw(const char* fmt, ...)
+std::wstring memmonitor::formatw(const char* fmt, ...)
 {
 	char textString[ 256] = {'\0'};
 	va_list args;

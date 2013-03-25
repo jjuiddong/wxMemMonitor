@@ -12,7 +12,7 @@
 #pragma once
 
 
-namespace common
+namespace memmonitor
 {
 	std::string wstr2str(const std::wstring &wstr);
 	std::wstring str2wstr(const std::string &str);

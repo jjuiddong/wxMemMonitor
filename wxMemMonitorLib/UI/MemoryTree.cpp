@@ -54,9 +54,9 @@ bool CMemoryTree::UpdateMemoryMap()
 	m_pTree->DeleteAllItems();
 
 	wxTreeItemId rootId = m_pTree->AddRoot(wxT("@Root"));
-	sharedmemory::MemoryList memList;
-	sharedmemory::EnumerateMemoryInfo(memList);
-	BOOST_FOREACH(sharedmemory::SMemoryInfo &info, memList)
+	MemoryList memList;
+	EnumerateMemoryInfo(memList);
+	BOOST_FOREACH(SMemInfo &info, memList)
 	{
 		wxTreeItemId itemId = m_pTree->AppendItem( rootId, info.name );
 		m_pTree->AppendItem( itemId, wxString::Format("size: %d", info.size) );
@@ -86,7 +86,6 @@ void CMemoryTree::OnRefreshTimer(wxTimerEvent& event)
 //------------------------------------------------------------------------
 void CMemoryTree::OnTreectrlSelChanged( wxTreeEvent& event )
 {
-	return;
 	const wxString text = m_pTree->GetItemText( event.GetItem() );
 	PropWindowPtr pPropWnd = GetPropertyWindow();
 	RET(!pPropWnd);

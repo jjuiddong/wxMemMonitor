@@ -1,13 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common\Common.vcxproj", "{F3998DC9-8441-45D0-A8F0-719C0A06C955}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Target", "Target\Target.vcxproj", "{C303EB1E-1A2F-4534-9A5D-9E65AC6570B7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{20D4FC42-81E1-469F-8697-705005321531} = {20D4FC42-81E1-469F-8697-705005321531}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxMemMonitorLib", "wxMemMonitorLib\wxMemMonitorLib.vcxproj", "{20D4FC42-81E1-469F-8697-705005321531}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxMemMonitorExe", "wxMemMonitorExe\wxMemMonitorExe.vcxproj", "{AC1AA0B1-2E4D-45CB-B519-AC73EA582891}"
+	ProjectSection(ProjectDependencies) = postProject
+		{20D4FC42-81E1-469F-8697-705005321531} = {20D4FC42-81E1-469F-8697-705005321531}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +19,6 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F3998DC9-8441-45D0-A8F0-719C0A06C955}.Debug|Win32.ActiveCfg = Debug|Win32
-		{F3998DC9-8441-45D0-A8F0-719C0A06C955}.Debug|Win32.Build.0 = Debug|Win32
-		{F3998DC9-8441-45D0-A8F0-719C0A06C955}.Release|Win32.ActiveCfg = Release|Win32
-		{F3998DC9-8441-45D0-A8F0-719C0A06C955}.Release|Win32.Build.0 = Release|Win32
 		{C303EB1E-1A2F-4534-9A5D-9E65AC6570B7}.Debug|Win32.ActiveCfg = Debug|Win32
 		{C303EB1E-1A2F-4534-9A5D-9E65AC6570B7}.Debug|Win32.Build.0 = Debug|Win32
 		{C303EB1E-1A2F-4534-9A5D-9E65AC6570B7}.Release|Win32.ActiveCfg = Release|Win32

@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "../wxMemMonitor.h"
 #include "../Control/Global.h"
+#include "SharedMemoryMng.h"
 
 
 namespace memmonitor
@@ -41,7 +42,7 @@ void* memmonitor::Allocate(const std::string &name, size_t size)
 //------------------------------------------------------------------------
 // 
 //------------------------------------------------------------------------
-bool memmonitor::DeAllocate(void *ptr)
+bool memmonitor::DeAllocateMem(void *ptr)
 {
 	bool result = false;
 	switch (GetExecuteType())
@@ -164,11 +165,15 @@ void* memmonitor::MemoryMapping(void *srcPtr )
 
 
 //------------------------------------------------------------------------
-// 
+// TypeName%Count 형태로 되어있는 타입이름을 TypeName만 리턴하게 한다.
 //------------------------------------------------------------------------
 std::string memmonitor::ParseObjectName(const std::string &objectName)
 {
-	return sharedmemory::ParseObjectName(objectName);
+	const int offset = objectName.find('#');
+	if (std::string::npos == offset)
+		return objectName;
+	else
+		return objectName.substr(0,offset);
 }
 
 
@@ -184,4 +189,3 @@ bool	memmonitor::CheckValidAddress(const void *ptr )
 	}
 	return false;
 }
-

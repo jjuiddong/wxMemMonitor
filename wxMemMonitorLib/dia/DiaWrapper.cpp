@@ -50,7 +50,7 @@ bool CDiaWrapper::Init(const string &pdbFileName)
  		return false;
  	}
 
-	hr = m_pDiaDataSource->loadDataFromPdb( common::str2wstr(pdbFileName).c_str() );
+	hr = m_pDiaDataSource->loadDataFromPdb( memmonitor::str2wstr(pdbFileName).c_str() );
 	if (FAILED(hr)) 
 		return false;
 
@@ -90,7 +90,7 @@ IDiaSymbol* CDiaWrapper::FindType(const std::string &typeName)
 	RETV(!m_pGlobalSymbol, NULL);
 
 	CComPtr<IDiaEnumSymbols> pEnumSymbols;
-	if (FAILED(m_pGlobalSymbol->findChildren(SymTagNull, common::str2wstr(typeName).c_str(), 
+	if (FAILED(m_pGlobalSymbol->findChildren(SymTagNull, memmonitor::str2wstr(typeName).c_str(), 
 		nsRegularExpression, &pEnumSymbols))) 
 		return NULL;
 
@@ -157,7 +157,7 @@ ULONGLONG CDiaWrapper::GetSymbolLength(IDiaSymbol *pSymbol)
 // 		BSTR name;
 // 		if (pBaseType->get_name(&name) == S_OK)
 // 		{
-// 			reval = common::wstring2string(name);	
+// 			reval = memmonitor::wstring2string(name);	
 // 			SysFreeString(name);
 // 		}
 // 	}
@@ -166,7 +166,7 @@ ULONGLONG CDiaWrapper::GetSymbolLength(IDiaSymbol *pSymbol)
 // 		BSTR name;
 // 		if (pSymbol->get_name(&name) == S_OK)
 // 		{
-// 			reval = common::wstring2string(name);	
+// 			reval = memmonitor::wstring2string(name);	
 // 			SysFreeString(name);
 // 		}
 // 	}
@@ -363,7 +363,7 @@ _variant_t dia::GetValue(void *srcPtr, VARTYPE varType)
 		// 			std::string str;
 		// 			operator>>(str);
 		// #ifdef _UNICODE
-		// 			var.bstrVal = (_bstr_t)common::string2wstring(str).c_str();
+		// 			var.bstrVal = (_bstr_t)memmonitor::string2wstring(str).c_str();
 		// #else
 		// 			var.bstrVal = (_bstr_t)str.c_str();
 		// #endif
@@ -401,7 +401,7 @@ void	dia::SetValue(void *destPtr, _variant_t value)
 // 			std::string str;
 // 			operator>>(str);
 // #ifdef _UNICODE
-// 			var.bstrVal = (_bstr_t)common::string2wstring(str).c_str();
+// 			var.bstrVal = (_bstr_t)memmonitor::string2wstring(str).c_str();
 // #else
 // 			var.bstrVal = (_bstr_t)str.c_str();
 // #endif
@@ -427,17 +427,17 @@ std::string dia::GetSymbolName(IDiaSymbol *pSymbol)
 	std::string name;
 	if (pSymbol->get_undecoratedName(&bstrUndName) == S_OK) {
 		if (wcscmp(bstrName, bstrUndName) == 0) {
-			name = common::wstr2str(bstrName);
+			name = memmonitor::wstr2str(bstrName);
 		}
 		else {
-			name = common::wstr2str(bstrName) +
-				"(" + common::wstr2str(bstrName) + ")";
+			name = memmonitor::wstr2str(bstrName) +
+				"(" + memmonitor::wstr2str(bstrName) + ")";
 		}
 
 		SysFreeString(bstrUndName);
 	}
 	else {
-		name = common::wstr2str(bstrName);
+		name = memmonitor::wstr2str(bstrName);
 	}
 
 	SysFreeString(bstrName);
@@ -643,7 +643,7 @@ IDiaSymbol* dia::FindChildSymbol( const std::string &symbolName,
 	RETV( !pParentSymbol, NULL );
 
 	const string name = GetSymbolName(pParentSymbol); //debug용
-	const wstring searchSymbolName = common::str2wstr(symbolName).c_str();
+	const wstring searchSymbolName = memmonitor::str2wstr(symbolName).c_str();
 
 	// 데이타 심볼이면, 타입 심볼로 교체한다.
 	enum SymTagEnum symTag;

@@ -2,8 +2,7 @@
 #include "stdafx.h"
 #include "log.h"
 
-using namespace common;
-using namespace log;
+using namespace memmonitor;
 using namespace std;
 
 
@@ -16,7 +15,7 @@ void log::Log(const std::string &str)
 	ofstream fs("Log.log", ios_base::out);
 	if (!fs.is_open()) return;
 
-	fs << "[" << common::GetTimeString() << "]	" << str << endl;
+	fs << "[" << GetTimeString() << "]	" << str << endl;
 }
 
 
@@ -33,5 +32,5 @@ void log::Log( const char* fmt, ...)
 
 	ofstream fs("Log.log", ios_base::out);
 	if (!fs.is_open()) return;
-	fs << "[" << common::GetTimeString() << "]	" << textString << endl;
+	fs << "[" << GetTimeString() << "]	" << textString << endl;
 }

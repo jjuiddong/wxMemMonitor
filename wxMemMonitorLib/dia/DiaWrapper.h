@@ -15,7 +15,7 @@ struct IDiaSymbol;
 
 namespace dia
 {
-	class CDiaWrapper : public common::CSingleton<CDiaWrapper>
+	class CDiaWrapper : public memmonitor::CSingleton<CDiaWrapper>
 	{
 	public:
 		CDiaWrapper();
