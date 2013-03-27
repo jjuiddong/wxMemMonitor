@@ -304,7 +304,8 @@ bool memmonitor::RepositioningWindow()
 		using boost::property_tree::ptree;
 		using std::string;
 		ptree props;
-		boost::property_tree::read_json( "windowpos.json", props );
+		std::string filename = g_ConfigFileName + ".windowsize.json";
+		boost::property_tree::read_json( filename, props );
 
 		string mainW  = props.get<string>("main window");
 		wxRect mainR = ParseRect(mainW);
@@ -354,7 +355,8 @@ void memmonitor::WriteWindowPosition()
 			props.add( name.c_str(), format("%d %d %d %d", r.x, r.y, r.width, r.height) );
 		}
 
-		boost::property_tree::write_json( "windowpos.json", props );
+		std::string filename = g_ConfigFileName + ".windowsize.json";		
+		boost::property_tree::write_json( filename, props );
 	}
 	catch (std::exception &e)
 	{
