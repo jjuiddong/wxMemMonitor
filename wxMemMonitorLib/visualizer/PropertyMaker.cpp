@@ -42,9 +42,9 @@ namespace visualizer
 
 
 	// evaluate
-	CComVariant Eval_Expression( SExpression *pexp, const SSymbolInfo &symbol);
+	_variant_t Eval_Expression( SExpression *pexp, const SSymbolInfo &symbol);
 
-	CComVariant Eval_Variable( SExpression *pexp, const SSymbolInfo &symbol );
+	_variant_t Eval_Variable( SExpression *pexp, const SSymbolInfo &symbol );
 
 	// Find
 	bool Find_Variable( SExpression *pexp, 
@@ -264,21 +264,21 @@ void visualizer::MakePropertyIteratorStmt( SVisBracketIterator_Stmt *pitor_stmt,
 			CheckError( pitor_stmt->stmts->expr || pitor_stmt->disp_stmt , "#list expr, disp_stmt not setting" );
 
 			// $e 설정, IDiaSymbol
-			CComVariant size;
+			_variant_t size;
 			if (pitor_stmt->stmts->size)
 			{
 				size = Eval_Variable(pitor_stmt->stmts->size, symbol);
 				CheckError( size.vt != VT_EMPTY, "#list size expression error" );
 			}
 
-			CComVariant skip;
+			_variant_t skip;
 			if (pitor_stmt->stmts->skip)
 			{
 				skip = Eval_Variable(pitor_stmt->stmts->skip, symbol);
 				CheckError( skip.vt != VT_EMPTY, "#list skip expression error" );
 			}
 
-			CComVariant node = Eval_Variable(pitor_stmt->stmts->head, symbol );
+			_variant_t node = Eval_Variable(pitor_stmt->stmts->head, symbol );
 			CheckError( node.vt != VT_EMPTY, "#list head expression error" );
 
 			SSymbolInfo each;
@@ -561,9 +561,9 @@ void visualizer::Disp_Expression( SExpression *pexp )
 //------------------------------------------------------------------------
 // SExpression 값을 리턴한다.
 //------------------------------------------------------------------------
-CComVariant visualizer::Eval_Expression( SExpression *pexp, const SSymbolInfo &symbol )
+_variant_t visualizer::Eval_Expression( SExpression *pexp, const SSymbolInfo &symbol )
 {
-	CComVariant reval;
+	_variant_t reval;
 	RETV(!pexp, reval);
 
 	switch (pexp->kind)
@@ -572,21 +572,21 @@ CComVariant visualizer::Eval_Expression( SExpression *pexp, const SSymbolInfo &s
 		{
 			switch (pexp->op)
 			{
-			case LT: reval = Eval_Expression(pexp->lhs, symbol) < Eval_Expression(pexp->rhs, symbol); break;
-			case RT: reval = Eval_Expression(pexp->lhs, symbol) > Eval_Expression(pexp->rhs, symbol); break;
+			case LT: reval = ((float)Eval_Expression(pexp->lhs, symbol) < (float)Eval_Expression(pexp->rhs, symbol)); break;
+			case RT: reval = ((float)Eval_Expression(pexp->lhs, symbol) > (float)Eval_Expression(pexp->rhs, symbol)); break;
 			case LTEQ: /* <= */
-				reval = (Eval_Expression(pexp->lhs, symbol) < Eval_Expression(pexp->rhs, symbol)) 
-					|| Eval_Expression(pexp->lhs, symbol) == Eval_Expression(pexp->rhs, symbol);
+				reval = ((float)Eval_Expression(pexp->lhs, symbol) < (float)Eval_Expression(pexp->rhs, symbol)) 
+					|| ((float)Eval_Expression(pexp->lhs, symbol) == (float)Eval_Expression(pexp->rhs, symbol));
 				break;
 			case RTEQ:	/* >= */
-				reval = (Eval_Expression(pexp->lhs, symbol) > Eval_Expression(pexp->rhs, symbol)) 
-					|| Eval_Expression(pexp->lhs, symbol) == Eval_Expression(pexp->rhs, symbol);
+				reval = ((float)Eval_Expression(pexp->lhs, symbol) > (float)Eval_Expression(pexp->rhs, symbol)) 
+					|| ((float)Eval_Expression(pexp->lhs, symbol) == (float)Eval_Expression(pexp->rhs, symbol));
 				break;
-			case NEQ:	reval = Eval_Expression(pexp->lhs, symbol) != Eval_Expression(pexp->rhs, symbol); break; /* != */
-			case EQ:	reval = Eval_Expression(pexp->lhs, symbol) == Eval_Expression(pexp->rhs, symbol); break; /* == */
-			case OR: reval = Eval_Expression(pexp->lhs, symbol).llVal || Eval_Expression(pexp->rhs, symbol).llVal; break; /* || */
-			case AND: reval = (int)Eval_Expression(pexp->lhs, symbol).llVal && (int)Eval_Expression(pexp->rhs, symbol).llVal; break; /* && */
-			case NEG: reval = !Eval_Expression(pexp->lhs, symbol).llVal; break;
+			case NEQ:	reval = ((int)Eval_Expression(pexp->lhs, symbol) != (int)Eval_Expression(pexp->rhs, symbol)); break; /* != */
+			case EQ:	reval = ((int)Eval_Expression(pexp->lhs, symbol) == (int)Eval_Expression(pexp->rhs, symbol)); break; /* == */
+			case OR: reval = ((int)Eval_Expression(pexp->lhs, symbol).llVal || (int)Eval_Expression(pexp->rhs, symbol).llVal); break; /* || */
+			case AND: reval = ((int)Eval_Expression(pexp->lhs, symbol).llVal && (int)Eval_Expression(pexp->rhs, symbol).llVal); break; /* && */
+			case NEG: reval = (!(int)Eval_Expression(pexp->lhs, symbol).llVal); break;
 			}
 		}	
 		break;
@@ -615,9 +615,9 @@ CComVariant visualizer::Eval_Expression( SExpression *pexp, const SSymbolInfo &s
 //------------------------------------------------------------------------
 // Variable 을 추적한다.
 //------------------------------------------------------------------------
-CComVariant visualizer::Eval_Variable( SExpression *pexp, const SSymbolInfo &symbol )
+_variant_t visualizer::Eval_Variable( SExpression *pexp, const SSymbolInfo &symbol )
 {
-	CComVariant reval;
+	_variant_t reval;
 	RETV(!pexp, reval);
 	RETV(pexp->kind != VariableK, reval);
 
