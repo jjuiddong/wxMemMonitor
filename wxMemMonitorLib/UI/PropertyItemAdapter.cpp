@@ -19,7 +19,7 @@ CPropertyItemAdapter::CPropertyItemAdapter( std::string label,  PROPERTY_TYPE ty
 	switch (type)
 	{
 	case PROPERTY_STRING:
-		m_pProperty = new wxStringProperty(label, wxPG_LABEL, "<composed>" );
+		m_pProperty = new wxStringProperty(label, wxPG_LABEL, "" );
 		break;
 	//case PROPERTY_PARENT:
 	//	m_pProperty = new wxStringProperty(label, wxPG_LABEL, "<composed>" );

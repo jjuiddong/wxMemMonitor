@@ -23,19 +23,20 @@ END_EVENT_TABLE()
 CPropertyWindow::CPropertyWindow(wxWindow *parent)  : 
 	wxPropertyGridManager(parent, wxID_ANY, wxDefaultPosition, wxSize(500,300), 
 		wxPG_BOLD_MODIFIED |
-		wxPG_SPLITTER_AUTO_CENTER |
 		wxPG_AUTO_SORT |
+		wxPG_SPLITTER_AUTO_CENTER |
 		//wxPG_HIDE_MARGIN|wxPG_STATIC_SPLITTER |
 		//wxPG_TOOLTIPS |
 		//wxPG_HIDE_CATEGORIES |
 		//wxPG_LIMITED_EDITING |
-		wxPG_TOOLBAR
+		wxPG_TOOLBAR 
 		//wxPG_DESCRIPTION 
 		)
 {
 	const int extraStyle = wxPG_EX_MODE_BUTTONS |
 		wxPG_EX_MULTIPLE_SELECTION;
 	SetExtraStyle(extraStyle);
+	SetColumnCount(3);
 
 	m_Timer.SetOwner(this, ID_REFRESH_TIMER);
 	m_Timer.Start( REFRESH_INTERVAL );
@@ -69,6 +70,12 @@ void CPropertyWindow::UpdateSymbol( const wxString &symbolName )
 	wxPropertyGrid *pPropGrid = GetGrid();
 	pPropGrid->Clear();
 	ClearPropItem();
+
+	pPropGrid->SetColumnCount(3);
+	//pPropGrid->setcolumnt
+	//SetColumnTitle(0, "name");
+	//SetColumnTitle(1, "value");
+	//SetColumnTitle(2, "type");
 
 	std::string tmpStr = symbolName;
 	std::string str = ParseObjectName(tmpStr);
@@ -142,13 +149,20 @@ void	CPropertyWindow::AddProperty( wxPGProperty *pParentProp, wxPGProperty *prop
 	if (pParentProp)
 	{
 		AppendIn( pParentProp, prop );
+
+		// insert type column cell
+		std::string typeName = dia::GetSymbolTypeName(pSymbol->pSym);
+		if (typeName == "NoType") typeName = "";
+		wxPGCell cell( typeName );
+		cell.SetBgCol(wxColour(255,255,255));
+		prop->SetCell(2,  cell);
+		//
 	}
 	else
 	{
 		wxPGProperty *pg = Append(prop);
 	}
 }
-
 
 
 /**
@@ -191,6 +205,8 @@ void CPropertyWindow::OnPropertyGridChange( wxPropertyGridEvent& event )
 //------------------------------------------------------------------------
 void CPropertyWindow::OnPropertyGridSelect( wxPropertyGridEvent& event )
 {
+	SetFocus();
+
 	wxPGProperty* pProp = event.GetProperty();
 	RET(!pProp);
 	wxString name = pProp->GetName();

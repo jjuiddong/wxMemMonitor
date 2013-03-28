@@ -236,9 +236,10 @@ void	visualizer ::MakeProperty_BaseClass(wxPGProperty *pParentProp,
 	MakeProperty_Child(pParentProp, SSymbolInfo(pBaseType, newMemInfo), depth);
 }
 
-//------------------------------------------------------------------------
-// baseclass type preview
-//------------------------------------------------------------------------
+
+/**
+@brief  baseclass type preview
+*/
 wxPGProperty* visualizer::MakeProperty_BaseClassData(
 	wxPGProperty *pParentProp, const SSymbolInfo &symbol)
 {
@@ -327,7 +328,7 @@ void visualizer ::MakeProperty_Data(wxPGProperty *pParentProp, const SSymbolInfo
 	{
 	case SymTagBaseType:
 		{
-			string valueTypeName = symbol.mem.name + " (" + dia::GetSymbolTypeName(symbol.pSym) + ")";
+			string valueTypeName = symbol.mem.name;// + " (" + dia::GetSymbolTypeName(symbol.pSym) + ")";
 			MakeProperty_BaseType( pParentProp, valueTypeName, symbol);
 		}
 		break;
@@ -335,7 +336,7 @@ void visualizer ::MakeProperty_Data(wxPGProperty *pParentProp, const SSymbolInfo
 	case SymTagEnum:
 		{
 			std::string typeName = dia::GetSymbolTypeName(pBaseType);
-			std::string valueTypeName =  symbol.mem.name + " (" +  typeName + ")";
+			std::string valueTypeName =  symbol.mem.name;// + " (" +  typeName + ")";
 
 			CPropertyItemAdapter prop( valueTypeName,  CPropertyItemAdapter::PROPTYPE_ENUM ); 
 			AddProperty(pParentProp, prop.GetProperty(), &symbol, &STypeData(baseSymTag, VT_UI4, symbol.mem.ptr));
@@ -420,11 +421,11 @@ wxPGProperty* visualizer::MakeProperty_ArrayData(wxPGProperty *pParentProp,
 		if (btChar == btype)
 			ss << symbol.mem.name << " {\"" << (char*)symbol.mem.ptr << "\"}";
 		else
-			ss << symbol.mem.name << " " << symbol.mem.ptr << " (" << typeName << ")";
+			ss << symbol.mem.name << " " << symbol.mem.ptr; // << " (" << typeName << ")";
 	}
 	else // UDT Array
 	{
-		ss << symbol.mem.name << " (" << typeName << ")";
+		ss << symbol.mem.name; // << " (" << typeName << ")";
 	}
 
 	CPropertyItemAdapter prop( ss.str() );
@@ -467,7 +468,7 @@ wxPGProperty* visualizer::MakeProperty_PointerData(
 	{
 		ss << symbol.mem.name << " 0x" << newPtr;
 		ss << (char*)(CheckValidAddress(newPtr)? " " : " not shared memory");
-		ss << " (" << typeName << ")";
+		//ss << " (" << typeName << ")";
 	}
 	else if (SymTagBaseType == baseSymTag)
 	{
@@ -487,7 +488,7 @@ wxPGProperty* visualizer::MakeProperty_PointerData(
 	{
 		ss << symbol.mem.name << " 0x" << newPtr;
 		ss << (char*)(CheckValidAddress(newPtr)? " " : " not shared memory");
-		ss << " (" << typeName << ")";
+		//ss << " (" << typeName << ")";
 	}
 
 	CPropertyItemAdapter prop( ss.str() );
@@ -508,8 +509,8 @@ wxPGProperty* visualizer::MakeProperty_UDTData(
 	// 최상위 UDT가 아닐때만 타입을 출력한다.
 	stringstream ss;
 	ss << symbol.mem.name;
-	if (pParentProp)
-		ss << "  (" << typeName << ")";
+	//if (pParentProp)
+	//	ss << "  (" << typeName << ")";
 
 	CPropertyItemAdapter prop( ss.str());//,  CPropertyItemAdaptor::PROPERTY_PARENT);
 	AddProperty(pParentProp, prop.GetProperty(), &symbol, &STypeData(SymTagUDT, VT_EMPTY, symbol.mem.ptr));
