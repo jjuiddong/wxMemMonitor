@@ -355,7 +355,7 @@ void memmonitor::WriteWindowPosition()
 			props.add( name.c_str(), format("%d %d %d %d", r.x, r.y, r.width, r.height) );
 		}
 
-		std::string filename = g_ConfigFileName + ".windowsize.json";		
+		std::string filename = g_ConfigFileName + ".windowsize.json";
 		boost::property_tree::write_json( filename, props );
 	}
 	catch (std::exception &e)
