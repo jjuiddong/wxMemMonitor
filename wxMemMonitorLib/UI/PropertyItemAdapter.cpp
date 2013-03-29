@@ -21,10 +21,6 @@ CPropertyItemAdapter::CPropertyItemAdapter( std::string label,  PROPERTY_TYPE ty
 	case PROPERTY_STRING:
 		m_pProperty = new wxStringProperty(label, wxPG_LABEL, "" );
 		break;
-	//case PROPERTY_PARENT:
-	//	m_pProperty = new wxStringProperty(label, wxPG_LABEL, "<composed>" );
-	//	m_pProperty->ChangeFlag( wxPG_PROP_MISC_PARENT , true );
-	//	break;
 	case PROPTYPE_CATEGORY:
 		m_pProperty = new wxPropertyCategory(label, wxPG_LABEL );
 		break;
@@ -114,6 +110,10 @@ void CPropertyItemAdapter::SetVariant(const _variant_t &var)
 {
 	RET(!m_pProperty);
 	wxVariant wxVar = memmonitor::Variant2wxVariant(var);
+	
+	// bool 형일 때, enum 형태의 값으로 바꿔주어야 한다. 
+	if (var.vt == VT_BOOL)
+		wxVar = wxVariant((int)(var.bVal? true : false)); // bool 값은 widgets에서는 0 or 1 값이어야 한다.
 
 	if (m_pProperty->GetChoices().GetCount()) // enum value
 	{

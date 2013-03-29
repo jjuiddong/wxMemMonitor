@@ -37,6 +37,7 @@ CPropertyWindow::CPropertyWindow(wxWindow *parent)  :
 		wxPG_EX_MULTIPLE_SELECTION;
 	SetExtraStyle(extraStyle);
 	SetColumnCount(3);
+	GetGrid()->SetCellBackgroundColour(wxColour(237,237,237));
 
 	m_Timer.SetOwner(this, ID_REFRESH_TIMER);
 	m_Timer.Start( REFRESH_INTERVAL );
@@ -105,7 +106,7 @@ void CPropertyWindow::CheckSymbol( const wxString &symbolName )
 	std::string tmpStr = symbolName;
 	std::string str = ParseObjectName(tmpStr);
 
-	CComPtr<IDiaSymbol> pSymbol = CDiaWrapper::Get()->FindType(str);
+	CComPtr<IDiaSymbol> pSymbol = dia::FindType(str);
 	if (!pSymbol)
 	{
 		GetLogWindow()->PrintText( 
@@ -135,11 +136,11 @@ void	CPropertyWindow::AddProperty( wxPGProperty *pParentProp, wxPGProperty *prop
 	const visualizer::SSymbolInfo *pSymbol, STypeData *pTypeData )
 {
 	SPropItem *p = new SPropItem;
-	//p->prop = prop;
 	p->typeData = *pTypeData;
 	if (pSymbol)
 	{
 		p->typeName = dia::GetSymbolName(pSymbol->pSym);
+		p->symbolTypeName = dia::GetSymbolTypeName(pSymbol->pSym, false);
 		p->typeData.ptr = pSymbol->mem.ptr;
 	}
 	m_PropList.push_back(p);
@@ -154,7 +155,7 @@ void	CPropertyWindow::AddProperty( wxPGProperty *pParentProp, wxPGProperty *prop
 		std::string typeName = dia::GetSymbolTypeName(pSymbol->pSym);
 		if (typeName == "NoType") typeName = "";
 		wxPGCell cell( typeName );
-		cell.SetBgCol(wxColour(255,255,255));
+		cell.SetBgCol(wxColour(237,237,237));
 		prop->SetCell(2,  cell);
 		//
 	}
@@ -174,7 +175,7 @@ void CPropertyWindow::OnSize(wxSizeEvent& event)
 	{
 		const wxRect r = GetParent()->GetSize();
 		SetSize(r);
-		RecalculatePositions(r.width, r.height);
+		RecalculatePositions(r.width-20, r.height);
 	}
 	else
 	{
@@ -215,14 +216,20 @@ void CPropertyWindow::OnPropertyGridSelect( wxPropertyGridEvent& event )
 	if (pItemData && pItemData->typeData.vt == VT_EMPTY &&
 		pProp->GetChildCount() <= 0)
 	{
-		SSymbolInfo symbol;
-		if (!FindSymbolUpward( pProp, &symbol ))
+		IDiaSymbol *pSym = dia::FindType(pItemData->symbolTypeName);
+		if (!pSym)
 			return;
-		if (visualizer::MakePropertyChild_DefaultForm( this, pProp, symbol))
-		{
+
+		SSymbolInfo symbol( pSym, memmonitor::SMemInfo("*", pItemData->typeData.ptr, 0) );
+		visualizer::MakePropertyChild_DefaultForm( this, pProp, symbol );
+			
+		//if (!FindSymbolUpward( pProp, &symbol ))
+		//	return;
+		//if (visualizer::MakePropertyChild_DefaultForm( this, pProp, symbol))
+		//{
 			//pProp->Expand();
 			//AdjustLayout();
-		}
+		//}
 	}
 }
 
@@ -267,7 +274,7 @@ bool	CPropertyWindow::FindSymbolUpward( wxPGProperty *pProp, OUT SSymbolInfo *pO
 		{
 			// 찾기를 실패했다면, 현재 노드에서 찾기를 시도한다.
 			const string typeName = ParseObjectName(searchName);
-			pOut->pSym = CDiaWrapper::Get()->FindType( typeName );
+			pOut->pSym = dia::FindType( typeName );
 			RETV(!pOut->pSym, false);
 			pOut->mem = SMemInfo(pItemData->typeName.c_str(), pItemData->typeData.ptr, 0);
 		}
@@ -275,7 +282,7 @@ bool	CPropertyWindow::FindSymbolUpward( wxPGProperty *pProp, OUT SSymbolInfo *pO
 	else
 	{
 		const string typeName = ParseObjectName(searchName);
-		pOut->pSym = CDiaWrapper::Get()->FindType( typeName );
+		pOut->pSym = dia::FindType( typeName );
 		RETV(!pOut->pSym, false);
 		pOut->mem = SMemInfo(pItemData->typeName.c_str(), pItemData->typeData.ptr, 0); 
 	}

@@ -118,7 +118,7 @@ namespace visualizer { namespace parser {
 
 	struct SBracket_Inner_Stmts
 	{
-		SExpression *expr;
+		SExpression *expr;	/// display expression
 		SExpression *size;
 		SExpression *rank;
 		SExpression *base;
@@ -155,7 +155,7 @@ namespace visualizer { namespace parser {
 	{
 		VisBracketIteratorKind kind;
 		SBracket_Inner_Stmts *stmts;
-		SStatements *disp_stmt;
+		SStatements *disp_stmt;			/// bracket outer statement
 	};
 
 	struct SSimpleExp

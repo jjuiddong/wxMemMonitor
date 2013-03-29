@@ -65,7 +65,7 @@ bool visualizer::MakeProperty_DefaultForm( CPropertyWindow *pProperties,  const 
 {
 	const std::string str = ParseObjectName(symbolName);
 
-	IDiaSymbol *pSymbol = CDiaWrapper::Get()->FindType(str);
+	IDiaSymbol *pSymbol = dia::FindType(str);
 	RETV(!pSymbol, false);
 
 	SMemInfo memInfo;
@@ -466,7 +466,7 @@ wxPGProperty* visualizer::MakeProperty_PointerData(
 
 	if (SymTagUDT == baseSymTag)
 	{
-		ss << symbol.mem.name << " 0x" << newPtr;
+		ss << symbol.mem.name;// << " 0x" << newPtr;
 		ss << (char*)(CheckValidAddress(newPtr)? " " : " not shared memory");
 		//ss << " (" << typeName << ")";
 	}
@@ -479,14 +479,14 @@ wxPGProperty* visualizer::MakeProperty_PointerData(
 		// char* 타입이라면 스트링을 출력한다.
 		if (btChar == btype)
 		{
-			ss << symbol.mem.name << " 0x" << newPtr << " {\"";
+			ss << symbol.mem.name;// << " 0x" << newPtr << " {\"";
 			ss << (char*)(CheckValidAddress(newPtr)? newPtr : " not shared memory")  << "\"}";
 		}
 	}
 
 	if (ss.str().empty()) // default pointer 작업
 	{
-		ss << symbol.mem.name << " 0x" << newPtr;
+		ss << symbol.mem.name;// << " 0x" << newPtr;
 		ss << (char*)(CheckValidAddress(newPtr)? " " : " not shared memory");
 		//ss << " (" << typeName << ")";
 	}
@@ -516,7 +516,7 @@ wxPGProperty* visualizer::MakeProperty_UDTData(
 	AddProperty(pParentProp, prop.GetProperty(), &symbol, &STypeData(SymTagUDT, VT_EMPTY, symbol.mem.ptr));
 
 	const bool isVisualizerType = visualizer::MakeVisualizerProperty( g_pProperty, 
-		prop.GetProperty(), symbol.mem,  symbol.mem.name);
+		prop.GetProperty(), symbol );//  symbol.mem,  symbol.mem.name);
 	
 	return (isVisualizerType)? NULL : prop.GetProperty();
 }

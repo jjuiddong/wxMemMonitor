@@ -25,8 +25,8 @@ namespace memmonitor
 
 		struct SPropItem
 		{
-			//wxPGProperty *prop;
 			std::string typeName;		// dia symbol type name
+			std::string symbolTypeName;		// dia symbol type name
 			STypeData typeData;
 		};
 		typedef std::list<SPropItem*> PropList;

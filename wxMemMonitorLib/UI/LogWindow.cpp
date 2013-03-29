@@ -14,7 +14,7 @@ CLogWindow::CLogWindow(wxWindow *parent) :
 	wxTextCtrl(parent, -1, wxT("LogWindow\n"), wxDefaultPosition, wxSize(200,150),
 		wxTE_READONLY | wxTE_MULTILINE | wxSUNKEN_BORDER)
 {
-
+	SetBackgroundColour(wxColour(237,237,237));
 }
 
 

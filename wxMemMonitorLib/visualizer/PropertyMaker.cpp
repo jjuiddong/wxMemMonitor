@@ -5,6 +5,8 @@
 #include "../Dia/DiaWrapper.h"
 #include "DefaultPropertyMaker.h"
 #include <atlcomcli.h>
+#include "../Control/Global.h"
+#include "../ui/LogWindow.h"
 
 namespace visualizer
 {
@@ -27,11 +29,11 @@ namespace visualizer
 
 	void MakeProperty_AutoExpand( SAutoExp *pautoexp, const SSymbolInfo &symbol );
 
-	void MakePropertyStatements( SStatements *pstmt, const SSymbolInfo &symbol );
+	void MakePropertyStatements( SStatements *pstmt, const SSymbolInfo &symbol, const std::string &title="" );
 
 	void MakePropertySimpleExpression( SSimpleExp *pexp, const SSymbolInfo &symbol );
 
-	void MakePropertyExpression( SExpression *pexp, const SSymbolInfo &symbol );
+	void MakePropertyExpression( SExpression *pexp, const SSymbolInfo &symbol, const std::string &title="" );
 
 	void MakePropertyIfStmt( SIf_Stmt *pif_stmt, const SSymbolInfo &symbol );
 
@@ -69,13 +71,25 @@ SMemInfo m_MemInfo;
 CPropertyWindow *m_pPropertiesCtrl= NULL;
 wxPGProperty *m_pParentProperty = NULL;
 
-
+// exception class
 class VisualizerScriptError
 {
 public:
 	VisualizerScriptError(const string &msg) : m_Msg(msg) {}
 	string m_Msg;
 };
+
+
+/**
+ @brief 이중 포인터 값인 ptr을 실제 가르키는 포인터 값을 얻기위한 함수다.
+ */
+DWORD Point2PointValue(DWORD ptr)
+{
+	DWORD value = 0;
+	if (ptr)
+		value = *(DWORD*)(void*)ptr;
+	return value;
+}
 
 
 //------------------------------------------------------------------------
@@ -110,7 +124,7 @@ bool	visualizer::MakeVisualizerProperty( CPropertyWindow *pPropertiesWnd,
 	SVisualizerScript *pVisScript = FindVisualizer(str);
 	if (pVisScript)
 	{
-		IDiaSymbol *pSymbol = CDiaWrapper::Get()->FindType(str);
+		IDiaSymbol *pSymbol = dia::FindType(str);
 		RETV(!pSymbol, false);
 
 		m_SymbolName = str;
@@ -127,9 +141,9 @@ bool	visualizer::MakeVisualizerProperty( CPropertyWindow *pPropertiesWnd,
 				MakeProperty_AutoExpand(pVisScript->autoexp, 
 					SSymbolInfo(pSymbol, SMemInfo(symbolName.c_str(), memInfo.ptr,0)));
 		}
-		catch (VisualizerScriptError &)
+		catch (VisualizerScriptError &e)
 		{
-			//global::PrintOutputWnd( e.m_Msg );
+			GetLogWindow()->PrintText( e.m_Msg );
 		}
 		return true;
 	}
@@ -185,7 +199,7 @@ void visualizer::MakeProperty_AutoExpand( SAutoExp *pautoexp, const SSymbolInfo 
 //------------------------------------------------------------------------
 // 
 //------------------------------------------------------------------------
-void visualizer::MakePropertyStatements( SStatements *pstmt, const SSymbolInfo &symbol )
+void visualizer::MakePropertyStatements( SStatements *pstmt, const SSymbolInfo &symbol, const std::string &title ) // title
 {
 	RET(!pstmt);
 	SStatements *node = pstmt;
@@ -193,7 +207,7 @@ void visualizer::MakePropertyStatements( SStatements *pstmt, const SSymbolInfo &
 	{
 		switch (node->kind)
 		{
-		case Stmt_Expression: MakePropertyExpression(node->exp, symbol); break;
+		case Stmt_Expression: MakePropertyExpression(node->exp, symbol, title); break;
 		case Stmt_SimpleExpression: MakePropertySimpleExpression(node->simple_exp, symbol); break;
 		case Stmt_If: MakePropertyIfStmt(node->if_stmt, symbol); break;
 		case Stmt_Bracket_Iterator: MakePropertyIteratorStmt(node->itor_stmt, symbol); break;
@@ -263,13 +277,16 @@ void visualizer::MakePropertyIteratorStmt( SVisBracketIterator_Stmt *pitor_stmt,
 			CheckError( pitor_stmt->stmts->head && pitor_stmt->stmts->next, "#list head, next not setting" );
 			CheckError( pitor_stmt->stmts->expr || pitor_stmt->disp_stmt , "#list expr, disp_stmt not setting" );
 
-			// $e 설정, IDiaSymbol
-			_variant_t size;
+			// size 설정, IDiaSymbol
+			_variant_t size_v;
 			if (pitor_stmt->stmts->size)
 			{
-				size = Eval_Variable(pitor_stmt->stmts->size, symbol);
-				CheckError( size.vt != VT_EMPTY, "#list size expression error" );
+				size_v = Eval_Variable(pitor_stmt->stmts->size, symbol);
+				CheckError( size_v.vt != VT_EMPTY, "#list size expression error" );
 			}
+			int size = (int)size_v;
+			if (!pitor_stmt->stmts->size)
+				size = 100; // default
 
 			_variant_t skip;
 			if (pitor_stmt->stmts->skip)
@@ -277,23 +294,34 @@ void visualizer::MakePropertyIteratorStmt( SVisBracketIterator_Stmt *pitor_stmt,
 				skip = Eval_Variable(pitor_stmt->stmts->skip, symbol);
 				CheckError( skip.vt != VT_EMPTY, "#list skip expression error" );
 			}
+			const DWORD skipPtr = Point2PointValue((DWORD)skip);
 
-			_variant_t node = Eval_Variable(pitor_stmt->stmts->head, symbol );
+			const _variant_t node = Eval_Variable(pitor_stmt->stmts->head, symbol);
 			CheckError( node.vt != VT_EMPTY, "#list head expression error" );
+			DWORD nodePtr = Point2PointValue((DWORD)node);
 
 			SSymbolInfo each;
-			bool result = Find_Variable(pitor_stmt->stmts->head, symbol, &each);
+			const bool result = Find_Variable(pitor_stmt->stmts->head, symbol, &each);
  			CheckError( result, "#list head expression error, $e not found" );
 
 			int count = 0;
-//			while (node)
+			while (nodePtr 
+				&& (!skipPtr || (skipPtr && nodePtr != skipPtr))
+				&& (count < size))
 			{
-				MakePropertyExpression( pitor_stmt->stmts->expr, each);
-				MakePropertyStatements( pitor_stmt->disp_stmt, each );
-				// each.mem = ~~
+				std::stringstream ss;
+				ss << "[" << count << "]";
+				const std::string title = ss.str();
+
+				MakePropertyExpression( pitor_stmt->stmts->expr, each, title ); /// display
+				MakePropertyStatements( pitor_stmt->disp_stmt, each, title ); /// display
+
+				const bool result = Find_Variable(pitor_stmt->stmts->next, each, &each);
+				CheckError( result, "#list head expression error, $e not found" );
+
+				nodePtr = Point2PointValue((DWORD)each.mem.ptr);
 				++count;
 			}
-
 		}
 		break;
 
@@ -320,10 +348,10 @@ bool visualizer::MakePropertyElifStmt( SElif_Stmt *pelif_stmt, const SSymbolInfo
 }
 
 
-//------------------------------------------------------------------------
-// 
-//------------------------------------------------------------------------
-void visualizer::MakePropertyExpression( SExpression *pexp, const SSymbolInfo &symbol )
+/**
+ @brief 
+ */
+void visualizer::MakePropertyExpression( SExpression *pexp, const SSymbolInfo &symbol, const std::string &title ) // title = ""
 {
 	RET(!pexp);
 
@@ -343,7 +371,9 @@ void visualizer::MakePropertyExpression( SExpression *pexp, const SSymbolInfo &s
 			SSymbolInfo findSymbol;
 			const bool result = Find_Variable(pexp, symbol, &findSymbol);
 			CheckError(result, " variable expression error!!, undetected" );
-			visualizer::MakeProperty_DefaultForm( m_pPropertiesCtrl, m_pParentProperty, findSymbol);	
+			if (!title.empty())
+				findSymbol.mem.name = title;
+			visualizer::MakeProperty_DefaultForm( m_pPropertiesCtrl, m_pParentProperty, findSymbol);
 		}
 		break;
 

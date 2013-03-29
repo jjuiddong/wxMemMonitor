@@ -15,23 +15,16 @@ struct IDiaSymbol;
 
 namespace dia
 {
-	class CDiaWrapper : public memmonitor::CSingleton<CDiaWrapper>
-	{
-	public:
-		CDiaWrapper();
-		virtual ~CDiaWrapper();
-		bool						Init(const std::string &pdbFileName);
-		IDiaSymbol*		FindType(const std::string &typeName);
+	//class CDiaWrapper : public memmonitor::CSingleton<CDiaWrapper>
+	//{
+	//public:
+	//	CDiaWrapper();
+	//	virtual ~CDiaWrapper();
 
-	protected:
-		ULONGLONG		GetSymbolLength(IDiaSymbol *pSymbol);
+	bool						Init(const std::string &pdbFileName);
+	void						Cleanup();
+	IDiaSymbol*		FindType(const std::string &typeName);
 
-	protected:
-		IDiaDataSource	*m_pDiaDataSource;
-		IDiaSession		*m_pDiaSession;
-		IDiaSymbol		*m_pGlobalSymbol;
-		DWORD			m_dwMachineType;
-	};
 
 	// dia Global Functions
 	IDiaSymbol*		FindChildSymbol( const std::string &symbolName, IDiaSymbol *pSymbol, 

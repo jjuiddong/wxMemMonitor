@@ -4,20 +4,22 @@
 #include "dia2.h"
 #include <atlbase.h>
 
+
+namespace dia
+{
+	ULONGLONG		GetSymbolLength(IDiaSymbol *pSymbol);
+
+	IDiaDataSource	*m_pDiaDataSource = NULL;
+	IDiaSession		*m_pDiaSession = NULL;
+	IDiaSymbol		*m_pGlobalSymbol = NULL;
+	DWORD			m_dwMachineType = CV_CFL_80386;
+}
+
 using namespace std;
 using namespace dia;
 
 
-CDiaWrapper::CDiaWrapper() :
-	m_pDiaDataSource(NULL)
-,	m_pDiaSession(NULL)
-,	m_pGlobalSymbol(NULL)
-,	m_dwMachineType(CV_CFL_80386)
-{
-
-}
-
-CDiaWrapper::~CDiaWrapper()
+void	dia::Cleanup()
 {
 	SAFE_RELEASE(m_pGlobalSymbol);
 	SAFE_RELEASE(m_pDiaSession);
@@ -31,7 +33,7 @@ CDiaWrapper::~CDiaWrapper()
 // DIA 초기화
 // pdbFileName : PDB 파일명
 //------------------------------------------------------------------------
-bool CDiaWrapper::Init(const string &pdbFileName)
+bool dia::Init(const string &pdbFileName)
 {
 //	wchar_t wszExt[MAX_PATH];
 	string wszSearchPath = "SRV**\\\\symbols\\symbols"; // Alternate path to search for debug data
@@ -85,7 +87,7 @@ bool CDiaWrapper::Init(const string &pdbFileName)
 //------------------------------------------------------------------------
 // 
 //------------------------------------------------------------------------
-IDiaSymbol* CDiaWrapper::FindType(const std::string &typeName)
+IDiaSymbol* dia::FindType(const std::string &typeName)
 {
 	RETV(!m_pGlobalSymbol, NULL);
 
@@ -126,7 +128,7 @@ IDiaSymbol* CDiaWrapper::FindType(const std::string &typeName)
 //------------------------------------------------------------------------
 // pSymbol의 데이타 길이를 리턴한다.
 //------------------------------------------------------------------------
-ULONGLONG CDiaWrapper::GetSymbolLength(IDiaSymbol *pSymbol)
+ULONGLONG dia::GetSymbolLength(IDiaSymbol *pSymbol)
 {
 	ULONGLONG len = 0;
 	CComPtr<IDiaSymbol> psymType;
@@ -147,7 +149,7 @@ ULONGLONG CDiaWrapper::GetSymbolLength(IDiaSymbol *pSymbol)
 //------------------------------------------------------------------------
 // 타입이름을 리턴한다.
 //------------------------------------------------------------------------
-// std::string	CDiaWrapper::GetSymbolTypeName(IDiaSymbol *pSymbol)
+// std::string	dia::GetSymbolTypeName(IDiaSymbol *pSymbol)
 // {
 // 	std::string reval;
 // 

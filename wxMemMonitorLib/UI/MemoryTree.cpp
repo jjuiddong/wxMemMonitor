@@ -9,6 +9,7 @@
 using namespace memmonitor;
 
 BEGIN_EVENT_TABLE( memmonitor::CMemoryTree, wxPanel )
+	EVT_SIZE(CMemoryTree::OnSize)
 	EVT_TREE_SEL_CHANGED(ID_TREE, OnTreectrlSelChanged)
 	EVT_CONTEXT_MENU(CMemoryTree::OnContextMenu)
 	EVT_MENU(MENU_OPEN_PROPERTY, CMemoryTree::OnMenuOpenProperty)
@@ -24,6 +25,7 @@ CMemoryTree::CMemoryTree(wxWindow *parent) :
 		wxTR_HAS_BUTTONS |wxTR_LINES_AT_ROOT|wxTR_ROW_LINES|wxTR_SINGLE |
 		wxTR_FULL_ROW_HIGHLIGHT
 		);
+	m_pTree->SetBackgroundColour(wxColour(237,237,237));
 
 	UpdateMemoryMap();
 
@@ -137,4 +139,15 @@ void CMemoryTree::OnKeyDown(wxKeyEvent& event)
 void CMemoryTree::OnDestroy(wxWindowDestroyEvent &event)
 {
 	m_Timer.Stop();
+}
+
+
+/**
+ @brief Resize Event Handler
+ */
+void CMemoryTree::OnSize(wxSizeEvent& event)
+{
+	const wxRect r = GetSize();
+	if (m_pTree)
+		m_pTree->SetSize(r);
 }

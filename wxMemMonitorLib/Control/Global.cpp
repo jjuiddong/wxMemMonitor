@@ -217,7 +217,7 @@ bool	memmonitor::InitMemoryMonitor(const std::string &configFileName)
 		string shareMemoryName = props.get<string>("sharedmemoryname");
 
 		// Pdb Load
-		if (!dia::CDiaWrapper::Get()->Init(pdbPath))
+		if (!dia::Init(pdbPath))
 		{
 			SetErrorMsg(
 				format("%s Pdb 파일이 없습니다.\n", pdbPath.c_str()) );

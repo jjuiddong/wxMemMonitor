@@ -29,6 +29,7 @@ namespace memmonitor
 
 		// Event Handler
 		DECLARE_EVENT_TABLE()
+		void OnSize(wxSizeEvent& event);
 		void OnTreectrlSelChanged( wxTreeEvent& event );
 		void OnContextMenu(wxContextMenuEvent& event);
 		void OnMenuOpenProperty(wxCommandEvent& event);
