@@ -166,5 +166,16 @@ void CFrame::OnMenuExit(wxCommandEvent& event)
 //------------------------------------------------------------------------
 void CFrame::OnMenuHelp(wxCommandEvent& event)
 {
+}
 
+
+/**
+@brief  UpdatePaneSize
+*/
+void CFrame::UpdatePaneSize(wxWindow *pWindow, int w, int h)
+{
+	wxAuiPaneInfo& pane = m_mgr.GetPane(pWindow);
+	pane.MinSize(w,h);
+	m_mgr.Update();
+	pane.MinSize(10,10);
 }

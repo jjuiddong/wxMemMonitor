@@ -19,6 +19,9 @@ namespace memmonitor
 		STypeData() {}
 	};
 
+	typedef  std::map<std::string, SMemInfo> MapType;
+
+
 	bool							InitMemoryMonitor(const std::string &configFileName);
 	bool							ReadConfigFile(const std::string &fileName);
 	bool							RepositioningWindow();
@@ -42,4 +45,6 @@ namespace memmonitor
 	_variant_t				wxVariant2Variant(const VARTYPE &vartype, const wxVariant &wxVar);
 
 
+	MapType&				GetMemoryMap();
+	void							Clear();
 }

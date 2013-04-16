@@ -97,6 +97,11 @@
   <ItemGroup>
     <ResourceCompile Include="Target.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\wxMemMonitorLib\wxMemMonitorLib.vcxproj">
+      <Project>{937b4bdb-2bc4-43de-9e32-ba36aee888eb}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

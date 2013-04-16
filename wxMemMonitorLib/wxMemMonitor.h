@@ -20,6 +20,7 @@
 #include "wx/wx.h"
 #endif
 
+
 // using memory monitor inner process
 #define MEMORYMONITOR_INNER_PROCESS()			\
 	DECLARE_APP(memmonitor::CApp)							\
@@ -41,7 +42,6 @@ namespace memmonitor
 	};
 
 	bool Init(EXECUTE_TYPE type, HINSTANCE hInst, const std::string configFileName);
-	void Loop(MSG &msg);
 	void Cleanup();
 	
 	// Error Report
@@ -165,6 +165,10 @@ namespace memmonitor
 
 }
 
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+// MACRO
 
 #define DECLARE_TYPE_NAME(className)					\
 struct className##typeNameWrap								\

@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{20D4FC42-81E1-469F-8697-705005321531}</ProjectGuid>
+    <ProjectGuid>{937B4BDB-2BC4-43DE-9E32-BA36AEE888EB}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>wxMemMonitorLib</RootNamespace>
   </PropertyGroup>
@@ -20,12 +20,14 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -37,26 +39,18 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(IncludePath)</IncludePath>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <Lib>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -66,7 +60,6 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -75,6 +68,9 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\Log.h" />
     <ClInclude Include="common\Reference.h" />
@@ -97,6 +93,7 @@
     <ClInclude Include="UI\PropertyWindow.h" />
     <ClInclude Include="visualizer\DefaultPropertyMaker.h" />
     <ClInclude Include="visualizer\PropertyMaker.h" />
+    <ClInclude Include="visualizer\Variant.h" />
     <ClInclude Include="visualizer\VisualizerDefine.h" />
     <ClInclude Include="visualizer\VisualizerGlobal.h" />
     <ClInclude Include="visualizer\VisualizerParser.h" />
@@ -124,6 +121,7 @@
     <ClCompile Include="UI\PropertyWindow.cpp" />
     <ClCompile Include="visualizer\DefaultPropertyMaker.cpp" />
     <ClCompile Include="visualizer\PropertyMaker.cpp" />
+    <ClCompile Include="visualizer\Variant.cpp" />
     <ClCompile Include="visualizer\VisualizerDefine.cpp" />
     <ClCompile Include="visualizer\VisualizerGlobal.cpp" />
     <ClCompile Include="visualizer\VisualizerParser.cpp" />

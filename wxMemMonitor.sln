@@ -2,18 +2,12 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Target", "Target\Target.vcxproj", "{C303EB1E-1A2F-4534-9A5D-9E65AC6570B7}"
-	ProjectSection(ProjectDependencies) = postProject
-		{20D4FC42-81E1-469F-8697-705005321531} = {20D4FC42-81E1-469F-8697-705005321531}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxMemMonitorLib", "wxMemMonitorLib\wxMemMonitorLib.vcxproj", "{20D4FC42-81E1-469F-8697-705005321531}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxMemMonitorExe", "wxMemMonitorExe\wxMemMonitorExe.vcxproj", "{AC1AA0B1-2E4D-45CB-B519-AC73EA582891}"
-	ProjectSection(ProjectDependencies) = postProject
-		{20D4FC42-81E1-469F-8697-705005321531} = {20D4FC42-81E1-469F-8697-705005321531}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Target2", "Target2\Target2.vcxproj", "{C423AAF1-B361-492D-99F9-F534C3B22913}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxMemMonitorLib", "wxMemMonitorLib\wxMemMonitorLib.vcxproj", "{937B4BDB-2BC4-43DE-9E32-BA36AEE888EB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,10 +19,6 @@ Global
 		{C303EB1E-1A2F-4534-9A5D-9E65AC6570B7}.Debug|Win32.Build.0 = Debug|Win32
 		{C303EB1E-1A2F-4534-9A5D-9E65AC6570B7}.Release|Win32.ActiveCfg = Release|Win32
 		{C303EB1E-1A2F-4534-9A5D-9E65AC6570B7}.Release|Win32.Build.0 = Release|Win32
-		{20D4FC42-81E1-469F-8697-705005321531}.Debug|Win32.ActiveCfg = Debug|Win32
-		{20D4FC42-81E1-469F-8697-705005321531}.Debug|Win32.Build.0 = Debug|Win32
-		{20D4FC42-81E1-469F-8697-705005321531}.Release|Win32.ActiveCfg = Release|Win32
-		{20D4FC42-81E1-469F-8697-705005321531}.Release|Win32.Build.0 = Release|Win32
 		{AC1AA0B1-2E4D-45CB-B519-AC73EA582891}.Debug|Win32.ActiveCfg = Debug|Win32
 		{AC1AA0B1-2E4D-45CB-B519-AC73EA582891}.Debug|Win32.Build.0 = Debug|Win32
 		{AC1AA0B1-2E4D-45CB-B519-AC73EA582891}.Release|Win32.ActiveCfg = Release|Win32
@@ -37,6 +27,10 @@ Global
 		{C423AAF1-B361-492D-99F9-F534C3B22913}.Debug|Win32.Build.0 = Debug|Win32
 		{C423AAF1-B361-492D-99F9-F534C3B22913}.Release|Win32.ActiveCfg = Release|Win32
 		{C423AAF1-B361-492D-99F9-F534C3B22913}.Release|Win32.Build.0 = Release|Win32
+		{937B4BDB-2BC4-43DE-9E32-BA36AEE888EB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{937B4BDB-2BC4-43DE-9E32-BA36AEE888EB}.Debug|Win32.Build.0 = Debug|Win32
+		{937B4BDB-2BC4-43DE-9E32-BA36AEE888EB}.Release|Win32.ActiveCfg = Release|Win32
+		{937B4BDB-2BC4-43DE-9E32-BA36AEE888EB}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

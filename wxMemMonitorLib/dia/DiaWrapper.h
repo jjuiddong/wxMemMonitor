@@ -15,26 +15,20 @@ struct IDiaSymbol;
 
 namespace dia
 {
-	//class CDiaWrapper : public memmonitor::CSingleton<CDiaWrapper>
-	//{
-	//public:
-	//	CDiaWrapper();
-	//	virtual ~CDiaWrapper();
-
 	bool						Init(const std::string &pdbFileName);
 	void						Cleanup();
+
 	IDiaSymbol*		FindType(const std::string &typeName);
-
-
-	// dia Global Functions
 	IDiaSymbol*		FindChildSymbol( const std::string &symbolName, IDiaSymbol *pSymbol, 
 															OUT LONG *pOffset=NULL );
 
 	enum SymbolState { NEW_SYMBOL, PARAM_SYMBOL };
-	IDiaSymbol*		GetBaseTypeSymbol( IDiaSymbol *pSymbol, OUT SymbolState &result  );
+	IDiaSymbol*		GetBaseTypeSymbol( IDiaSymbol *pSymbol, DWORD option, OUT SymbolState &result  );
 
 	std::string			GetSymbolName(IDiaSymbol *pSymbol);
 	LONG					GetSymbolLocation(IDiaSymbol *pSymbol, OUT LocationType *pLocType=NULL);
+	ULONGLONG		GetSymbolLength(IDiaSymbol *pSymbol);
+
 	std::string			GetSymbolTypeName(IDiaSymbol *pSymbol, bool addOptionName=true);
 	std::string			GetBasicTypeName(BasicType btype, ULONGLONG length);
 	_variant_t			GetValueFromAddress(void *srcPtr, const BasicType btype, const ULONGLONG length );

@@ -1,12 +1,10 @@
-//------------------------------------------------------------------------
-// Name:    DefaultPropertyMaker.h
-// Author:  jjuiddong
-// Date:    1/30/2013
-// 
-// 
-//------------------------------------------------------------------------
-#ifndef __DEFAULTPROPERTYMAKER_H__
-#define __DEFAULTPROPERTYMAKER_H__
+/**
+Name:   DefaultPropertyMaker.h
+Author:  jjuiddong
+Date:    1/30/2013
+
+*/
+#pragma once
 
 #include "VisualizerGlobal.h"
 
@@ -23,15 +21,12 @@ namespace visualizer
 
 	bool		MakeProperty_DefaultForm( CPropertyWindow *pProperties,  const std::string &symbolName );
 
-	bool		MakeProperty_DefaultForm( CPropertyWindow *pProperties, wxPGProperty *pParentProp,  
+	bool		MakeProperty_DefaultForm( CPropertyWindow *pProperties,  wxPGProperty *pParentProp,
 		const std::string &symbolName );
 
 	bool		MakeProperty_DefaultForm(  CPropertyWindow *pProperties, wxPGProperty *pParentProp,  
-		const SSymbolInfo &symbol );
+		const SSymbolInfo &symbol, bool IsApplyVisualizer=true );
 
 	bool		MakePropertyChild_DefaultForm(  CPropertyWindow *pProperties, wxPGProperty *pParentProp,  
-		const SSymbolInfo &symbol );
-
+		const SSymbolInfo &symbol, bool IsApplyVisualizer=true );
 }
-
-#endif // __DEFAULTPROPERTYMAKER_H__

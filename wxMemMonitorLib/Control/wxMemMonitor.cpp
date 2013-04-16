@@ -19,7 +19,7 @@ namespace memmonitor
 	static const int CMD_SHOW_WINDOW = wxNewId();
 	static const int CMD_TERMINATE = wxNewId();
 
-	static const bool IsRunningThread = true;
+	static const bool IsThreadRunning = true;
 }
 
 
@@ -27,13 +27,13 @@ using namespace memmonitor;
 
 CApp::CApp()
 {
-	Connect(CMD_TERMINATE,
-		wxEVT_THREAD,
+	Connect(CMD_TERMINATE, wxEVT_THREAD,
 		wxThreadEventHandler(CApp::OnTerminate));
 }
 void CApp::OnTerminate(wxThreadEvent& WXUNUSED(event))
 {
 	ExitMainLoop();
+	OnExit();
 }
 
 //------------------------------------------------------------------------
@@ -46,7 +46,7 @@ bool memmonitor::Init(EXECUTE_TYPE type, HINSTANCE hInst, const std::string conf
 	SetExecuteType(type);
 	SetConfigFileName(configFileName);
 
-	if (IsRunningThread)
+	if (IsThreadRunning)
 	{
 		if (INNER_PROCESS == type)
 			return run_dll(type, hInst, configFileName);
@@ -74,18 +74,18 @@ bool memmonitor::Init(EXECUTE_TYPE type, HINSTANCE hInst, const std::string conf
 //------------------------------------------------------------------------
 // must call this message loop function
 //------------------------------------------------------------------------
-void memmonitor::Loop(MSG &msg)
-{
-	if (!IsRunningThread)
-	{
-		wxEventLoop * const
-			evtLoop = static_cast<wxEventLoop *>(wxEventLoop::GetActive());
-		if (evtLoop && evtLoop->PreProcessMessage(&msg))
-				return;
-		if (wxTheApp) 
-			wxTheApp->ProcessIdle(); // 이 함수를 호출해야 wxAuiManager Docking이 작동한다.
-	}
-}
+//void memmonitor::Loop(MSG &msg)
+//{
+//	if (!IsThreadRunning)
+//	{
+//		wxEventLoop * const
+//			evtLoop = static_cast<wxEventLoop *>(wxEventLoop::GetActive());
+//		if (evtLoop && evtLoop->PreProcessMessage(&msg))
+//				return;
+//		if (wxTheApp) 
+//			wxTheApp->ProcessIdle(); // 이 함수를 호출해야 wxAuiManager Docking이 작동한다.
+//	}
+//}
 
 
 //------------------------------------------------------------------------
@@ -93,36 +93,36 @@ void memmonitor::Loop(MSG &msg)
 //------------------------------------------------------------------------
 void memmonitor::Cleanup()
 {
-	if (IsRunningThread)
+	if (IsThreadRunning)
 	{
 		wxCriticalSectionLocker lock(gs_wxStartupCS);
 
-		if ( !gs_wxMainThread )
-			return;
-
-		// If wx main thread is running, we need to stop it. To accomplish this,
-		// send a message telling it to terminate the app.
-		if (wxApp::GetInstance())
+		if ( gs_wxMainThread )
 		{
-			wxThreadEvent *event =
-				new wxThreadEvent(wxEVT_THREAD, CMD_TERMINATE);
-			wxQueueEvent(wxApp::GetInstance(), event);
-		}
+			// If wx main thread is running, we need to stop it. To accomplish this,
+			// send a message telling it to terminate the app.
+			if (wxApp::GetInstance())
+			{
+				wxThreadEvent *event =
+					new wxThreadEvent(wxEVT_THREAD, CMD_TERMINATE);
+				wxQueueEvent(wxApp::GetInstance(), event);
+			}
 
-		// We must then wait for the thread to actually terminate.
-		WaitForSingleObject(gs_wxMainThread, INFINITE);
-		CloseHandle(gs_wxMainThread);
-		gs_wxMainThread = NULL;
+			// We must then wait for the thread to actually terminate.
+			WaitForSingleObject(gs_wxMainThread, INFINITE);
+			CloseHandle(gs_wxMainThread);
+			gs_wxMainThread = NULL;
+		}	
 	}
-	else
+
+	if (INNER_PROCESS == GetExecuteType())
 	{
-		if (INNER_PROCESS == GetExecuteType())
-		{
-			if ( wxTheApp )
-				wxTheApp->OnExit();
-			wxEntryCleanup();
-		}
+		if ( wxTheApp )
+			wxTheApp->OnExit();
+		wxEntryCleanup();
 	}
+
+	memmonitor::Clear();
 }
 
 

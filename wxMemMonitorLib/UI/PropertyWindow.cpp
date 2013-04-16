@@ -37,7 +37,7 @@ CPropertyWindow::CPropertyWindow(wxWindow *parent)  :
 		wxPG_EX_MULTIPLE_SELECTION;
 	SetExtraStyle(extraStyle);
 	SetColumnCount(3);
-	GetGrid()->SetCellBackgroundColour(wxColour(237,237,237));
+	GetGrid()->SetEmptySpaceColour(wxColour(237,237,237));
 
 	m_Timer.SetOwner(this, ID_REFRESH_TIMER);
 	m_Timer.Start( REFRESH_INTERVAL );
@@ -46,7 +46,7 @@ CPropertyWindow::CPropertyWindow(wxWindow *parent)  :
 		wxPropertyGridEventHandler(CPropertyWindow::OnPropertyGridChange) );
 	Connect(GetId(), wxEVT_PG_SELECTED,
 		wxPropertyGridEventHandler(CPropertyWindow::OnPropertyGridSelect) );	
-	Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CPropertyWindow::OnKeyDown));
+	Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CPropertyWindow::OnKeyDown)); 
 }
 
 CPropertyWindow::~CPropertyWindow() 
@@ -73,10 +73,6 @@ void CPropertyWindow::UpdateSymbol( const wxString &symbolName )
 	ClearPropItem();
 
 	pPropGrid->SetColumnCount(3);
-	//pPropGrid->setcolumnt
-	//SetColumnTitle(0, "name");
-	//SetColumnTitle(1, "value");
-	//SetColumnTitle(2, "type");
 
 	std::string tmpStr = symbolName;
 	std::string str = ParseObjectName(tmpStr);
@@ -94,7 +90,6 @@ void CPropertyWindow::UpdateSymbol( const wxString &symbolName )
 
 	//SetWindowTextW(symbolName);
 	m_CurrentSymbolName = symbolName;
-	//ChangeComboBoxFocus(symbolName);
 }
 
 
@@ -122,40 +117,61 @@ void CPropertyWindow::CheckSymbol( const wxString &symbolName )
 			"공유메모리에 " + tmpStr + " 타입의 정보가 없습니다.\n" );
 		return;
 	}
-
-	// Output창에 출력
-	//dbg::Print(  "%s 심볼 변경", tmpStr.c_str() );
-	//
 }
 
 
-//------------------------------------------------------------------------
-// 
-//------------------------------------------------------------------------
-void	CPropertyWindow::AddProperty( wxPGProperty *pParentProp, wxPGProperty *prop, 
+/**
+ @brief 
+ */
+wxPGProperty* CPropertyWindow::AddProperty( wxPGProperty *pParentProp, 
+	CPropertyItemAdapter &propAdapter, 
 	const visualizer::SSymbolInfo *pSymbol, STypeData *pTypeData )
 {
-	SPropItem *p = new SPropItem;
-	p->typeData = *pTypeData;
+	wxPGProperty*prop = propAdapter.GetProperty();
+	RETV(!prop, NULL);
+
+	if (pParentProp) // already exist? then return
+	{		
+		wxPGProperty *pChildProp = pParentProp->GetPropertyByName( prop->GetName() );
+		if (pChildProp)
+		{
+			delete prop;
+			propAdapter.SetProperty(pChildProp);
+			return propAdapter.GetProperty();
+		}
+	}
+
+	// setting Property Item Infomation
+	std::string typeName;
+	SPropItem *pPropItem = new SPropItem;
+	pPropItem->typeData = *pTypeData;
 	if (pSymbol)
 	{
-		p->typeName = dia::GetSymbolName(pSymbol->pSym);
-		p->symbolTypeName = dia::GetSymbolTypeName(pSymbol->pSym, false);
-		p->typeData.ptr = pSymbol->mem.ptr;
+		pPropItem->typeName = dia::GetSymbolName(pSymbol->pSym);
+		pPropItem->symbolTypeName = dia::GetSymbolTypeName(pSymbol->pSym, false);
+		pPropItem->typeData.ptr = pSymbol->mem.ptr;
+
+		typeName = dia::GetSymbolTypeName(pSymbol->pSym);
+		if (typeName == "NoType") typeName = "";
 	}
-	m_PropList.push_back(p);
+	m_PropList.push_back(pPropItem);
+	prop->SetClientData(pPropItem);
 
-	prop->SetClientData(p);
-
+	// Add Property
 	if (pParentProp)
 	{
 		AppendIn( pParentProp, prop );
 
+		// set background color
+		wxColour bgColor = pParentProp->GetCell(2).GetBgCol();
+		wxColour childColor = wxColour(bgColor.Red()-10, bgColor.Green()-10, bgColor.Blue()-10);
+		if (childColor.Red() < 100)
+			childColor = wxColour(100,100,100);
+		prop->SetBackgroundColour(childColor);
+
 		// insert type column cell
-		std::string typeName = dia::GetSymbolTypeName(pSymbol->pSym);
-		if (typeName == "NoType") typeName = "";
 		wxPGCell cell( typeName );
-		cell.SetBgCol(wxColour(237,237,237));
+		cell.SetBgCol(childColor);
 		prop->SetCell(2,  cell);
 		//
 	}
@@ -163,6 +179,8 @@ void	CPropertyWindow::AddProperty( wxPGProperty *pParentProp, wxPGProperty *prop
 	{
 		wxPGProperty *pg = Append(prop);
 	}
+
+	return prop;
 }
 
 
@@ -175,7 +193,7 @@ void CPropertyWindow::OnSize(wxSizeEvent& event)
 	{
 		const wxRect r = GetParent()->GetSize();
 		SetSize(r);
-		RecalculatePositions(r.width-20, r.height);
+		RecalculatePositions(r.width-20, r.height-20);
 	}
 	else
 	{
@@ -220,8 +238,13 @@ void CPropertyWindow::OnPropertyGridSelect( wxPropertyGridEvent& event )
 		if (!pSym)
 			return;
 
-		SSymbolInfo symbol( pSym, memmonitor::SMemInfo("*", pItemData->typeData.ptr, 0) );
+		DWORD ptr = (DWORD)pItemData->typeData.ptr;
+		if (SymTagPointerType == pItemData->typeData.symtag)
+			ptr = visualizer::Point2PointValue((DWORD)pItemData->typeData.ptr);
+
+		SSymbolInfo symbol( pSym, memmonitor::SMemInfo("*", (void*)ptr, 0) );
 		visualizer::MakePropertyChild_DefaultForm( this, pProp, symbol );
+
 			
 		//if (!FindSymbolUpward( pProp, &symbol ))
 		//	return;
@@ -296,7 +319,7 @@ bool	CPropertyWindow::FindSymbolUpward( wxPGProperty *pProp, OUT SSymbolInfo *pO
 //------------------------------------------------------------------------
 void	CPropertyWindow::RefreshPropertyItem( wxPGProperty *pProp )
 {
-	// if edit property item then return
+	// if property edit  item then return
 	if (GetGrid()->IsEditorFocused() && GetSelectedProperty() == pProp)
 		return;
 
@@ -372,9 +395,19 @@ void CPropertyWindow::OnKeyDown(wxKeyEvent& event)
 	if (344 == event.GetKeyCode()) // F5
 	{
 		wxPropertyGrid *pPropGrid = GetGrid();
+		wxPGProperty *pRoot = pPropGrid->GetRoot();
+		if (pRoot)
+		{
+			const std::string symbolName = m_CurrentSymbolName;
+			const bool result = visualizer::MakeProperty_DefaultForm(this, pRoot, symbolName);
+			Refresh();
+		}
+
 		wxPGVIterator it;
 		for ( it = pPropGrid->GetVIterator( wxPG_ITERATE_FIXED_CHILDREN ); !it.AtEnd(); it.Next() )
-			RefreshPropertyItem( it.GetProperty() );
+		{
+			it.GetProperty()->SetExpanded( true );
+			break;
+		}
 	}
 }
-

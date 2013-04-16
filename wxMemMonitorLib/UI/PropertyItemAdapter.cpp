@@ -13,19 +13,22 @@ CPropertyItemAdapter::CPropertyItemAdapter() :
 {
 }
 
-CPropertyItemAdapter::CPropertyItemAdapter( std::string label,  PROPERTY_TYPE type ) :
-	m_pProperty(NULL)
+CPropertyItemAdapter::CPropertyItemAdapter( std::string label,  PROPERTY_TYPE type, DWORD ptr, std::string strVal ) :
+	m_pProperty(NULL) // ptr = 0, strVal = ""
 {
 	switch (type)
 	{
 	case PROPERTY_STRING:
-		m_pProperty = new wxStringProperty(label, wxPG_LABEL, "" );
+		m_pProperty = new wxStringProperty(label, wxPG_LABEL, strVal );
 		break;
 	case PROPTYPE_CATEGORY:
 		m_pProperty = new wxPropertyCategory(label, wxPG_LABEL );
 		break;
 	case PROPTYPE_ENUM:
 		m_pProperty = new wxEnumProperty(label, wxPG_LABEL );	
+		break;
+	case PROPTYPE_POINTER:
+		m_pProperty = new wxIntProperty( label, wxPG_LABEL, (int)ptr);
 		break;
 	}
 }
@@ -117,7 +120,8 @@ void CPropertyItemAdapter::SetVariant(const _variant_t &var)
 
 	if (m_pProperty->GetChoices().GetCount()) // enum value
 	{
-		m_pProperty->SetValue( wxVar );
+		if (m_pProperty->GetChoices().GetCount() > (u_int)var)
+			m_pProperty->SetValue( wxVar );
 	}
 	else
 	{

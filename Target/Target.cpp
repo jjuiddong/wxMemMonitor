@@ -79,7 +79,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		memmonitor::Loop(msg);
 
 		const int curT = GetTickCount();
 		const int elapseT = min(curT - oldT, 100);

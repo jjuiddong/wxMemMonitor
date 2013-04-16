@@ -10,15 +10,6 @@ namespace memmonitor
 	void*	AllocateLocal(const std::string &name, size_t size);
 	bool		DeAllocateLocal(void *ptr);
 
-	struct SMemData
-	{
-		SMemData() : ptr(NULL) {}
-		SMemData(void *_ptr) : ptr(_ptr) {}
-		void *ptr;
-	};
-
-	typedef  std::map<std::string, SMemData> MapType;
-	MapType g_MemMap;
 }
 
 
@@ -59,15 +50,15 @@ bool memmonitor::DeAllocateMem(void *ptr)
 //------------------------------------------------------------------------
 void* memmonitor::AllocateLocal(const std::string &name, size_t size)
 {
-	auto it = g_MemMap.find(name);
-	if (g_MemMap.end() != it)
+	auto it = GetMemoryMap().find(name);
+	if (GetMemoryMap().end() != it)
 		return NULL; // already exist
 
 	void *ptr = ::malloc(size);
 	if (!ptr) // Error!!
 		return NULL;
 
-	g_MemMap.insert( MapType::value_type(name, SMemData(ptr)) );
+	GetMemoryMap().insert( MapType::value_type(name, SMemInfo(name.c_str(),ptr,0)) );
 	return ptr;
 }
 
@@ -77,12 +68,12 @@ void* memmonitor::AllocateLocal(const std::string &name, size_t size)
 //------------------------------------------------------------------------
 bool memmonitor::DeAllocateLocal(void *ptr)
 {
-	BOOST_FOREACH(auto &it, g_MemMap)
+	BOOST_FOREACH(auto &it, GetMemoryMap())
 	{
 		if (it.second.ptr == ptr)
 		{
 			::free(ptr);
-			g_MemMap.erase(it.first);
+			GetMemoryMap().erase(it.first);
 			return true;
 		}
 	}
@@ -99,7 +90,7 @@ void	memmonitor::EnumerateMemoryInfo(OUT MemoryList &memList)
 	{
 	case INNER_PROCESS:
 		{
-			BOOST_FOREACH(auto &it, g_MemMap)
+			BOOST_FOREACH(auto &it, GetMemoryMap())
 			{
 				memList.push_back( SMemInfo(it.first.c_str(), it.second.ptr, 0) );
 			}
@@ -129,8 +120,8 @@ bool	memmonitor::FindMemoryInfo(const std::string &name, OUT SMemInfo &info)
 	{
 	case INNER_PROCESS:
 		{
-			auto it = g_MemMap.find(name);
-			if (g_MemMap.end() == it)
+			auto it = GetMemoryMap().find(name);
+			if (GetMemoryMap().end() == it)
 				return false;
 			info = SMemInfo(name.c_str(), it->second.ptr, 0);
 		}

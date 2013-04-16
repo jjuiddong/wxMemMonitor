@@ -1,8 +1,8 @@
 
 #include "stdafx.h"
 #include "VisualizerParser.h"
-//#include "../MainFrm.h"
-//#include "../OutputWnd.h"
+#include "../Control/Global.h"
+#include "../ui/LogWindow.h"
 
 using namespace visualizer;
 using namespace parser;
@@ -336,6 +336,7 @@ bool parser::CParser::IsVisCommand(Tokentype tok)
 
 // 		simple_exp ->	text ':' '[' expression [,format] ']'
 //							| '[' expression [,format] ']'
+//							| text ':' expression
 // 			;
 SSimpleExp* parser::CParser::simple_exp()
 { 
@@ -344,13 +345,21 @@ SSimpleExp* parser::CParser::simple_exp()
 	p = new SSimpleExp;
 
 	Match(COLON);
-	Match(LBRACKET);
-	p->expr = expression();
 
-	// format
-	if (COMMA == m_Token)
-		p->format = display_format();
-	Match(RBRACKET);
+	if (LBRACKET == m_Token)
+	{
+		Match(LBRACKET);
+		p->expr = expression();
+
+		// format
+		if (COMMA == m_Token)
+			p->format = display_format();
+		Match(RBRACKET);
+	}
+	else
+	{
+		p->expr = expression();
+	}
 
 	return p;
 }
@@ -734,7 +743,7 @@ std::string parser::CParser::type_sub()
 // 			;
 
 // 		expression ->	term [condition_op expression]
-//								|  term [ '[' expression ']' ]
+//								|  term [ '[' expression ']' [ ->|. expression ]
 // 		;
 SExpression* parser::CParser::expression() 
 {
@@ -755,10 +764,20 @@ SExpression* parser::CParser::expression()
 		SExpression *p = NewExpression(IndirectK);
 		p->op = m_Token;
 		Match(p->op);
-		p->lhs = t;
-		p->rhs = expression();
-		t = p;
+		p->lhs = expression();
 		Match(RBRACKET);
+
+		if ((m_Token == ARROW) ||
+			(m_Token == DOT))
+		{
+			p->rhs = variable();
+		}
+
+		// right handle 에 붙인다.
+		SExpression *c = t;
+		while (c->rhs)
+			c = c->rhs;
+		c->rhs = p;
 	}
 	return t;
 }
@@ -903,7 +922,7 @@ SExpression* parser::CParser::primary_expression()
 	case NUM:
 	case FNUM:
 		p = NewExpression(NumberK);
-		p->num = (float)atof(m_pScan->GetTokenStringQ(0));		
+		p->num = (float)atof(m_pScan->GetTokenStringQ(0));
 		Match(m_Token);
 		break;
 
@@ -945,15 +964,15 @@ SExpression* parser::CParser::variable()
 
 	if (DOT  == m_Token 
 		|| ARROW == m_Token
-		|| LBRACKET == m_Token
+		//|| LBRACKET == m_Token
 		)
 	{
 		const Tokentype oldTok = m_Token;
 		p->varOpkind = m_Token;
 		Match(p->varOpkind);
 		p->rhs = variable();
-		if (LBRACKET == oldTok)
-			Match(RBRACKET);
+		//if (LBRACKET == oldTok)
+		//	Match(RBRACKET);
 	}
 	return p;
 }
@@ -990,6 +1009,9 @@ BOOL parser::CParser::Match( Tokentype t )
 	{
 		SyntaxError( "unexpected token -> " );
 
+		memmonitor::GetLogWindow()->PrintText( 
+			PrintToken( m_Token, m_pScan->GetTokenStringQ(0) ) );
+
 		//((CMainFrame*)::AfxGetMainWnd())->GetOutputWnd().AddString( 
 		//	common::str2wstr(
 		//		PrintToken( m_Token, m_pScan->GetTokenStringQ(0) )).c_str() );
@@ -1011,6 +1033,8 @@ void parser::CParser::SyntaxError( char *szMsg, ... )
 	std::stringstream ss;
 	ss << "Syntax error at line " << m_fileName << " " << m_pScan->GetLineNo() <<  ": " << buf ;
 
+	memmonitor::GetLogWindow()->PrintText( ">>>" );
+	memmonitor::GetLogWindow()->PrintText( ss.str() );
 	//((CMainFrame*)::AfxGetMainWnd())->GetOutputWnd().AddString( L">>>" );
  //	((CMainFrame*)::AfxGetMainWnd())->GetOutputWnd().AddString( 
  //		common::str2wstr(ss.str()).c_str() );

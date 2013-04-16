@@ -13,8 +13,10 @@ namespace visualizer {
 	struct SSymbolInfo;
 }
 
+
 namespace memmonitor
 {
+	class CPropertyItemAdapter;
 	class CPropertyWindow : public wxPropertyGridManager
 	{
 		enum  {
@@ -23,21 +25,21 @@ namespace memmonitor
 			REFRESH_INTERVAL = 1000,
 		};
 
+	public:
 		struct SPropItem
 		{
-			std::string typeName;		// dia symbol type name
+			std::string typeName;		// symbol type name
 			std::string symbolTypeName;		// dia symbol type name
 			STypeData typeData;
 		};
 		typedef std::list<SPropItem*> PropList;
 
-	public:
 		CPropertyWindow(wxWindow *parent);
 		virtual ~CPropertyWindow();
 
 		void UpdateSymbol( const wxString &symbolName );
 
-		void	AddProperty(wxPGProperty *pParentProp, wxPGProperty *prop, 
+		wxPGProperty*	AddProperty(wxPGProperty *pParentProp, CPropertyItemAdapter &propAdapter, 
 			const visualizer::SSymbolInfo *pSymbol, STypeData *pTypeData);
 
 	protected:
@@ -56,7 +58,7 @@ namespace memmonitor
 		void OnRefreshTimer(wxTimerEvent& event);
 		void OnKeyDown(wxKeyEvent& event);
 
-	protected:
+	private:
 		wxString	m_CurrentSymbolName;
 		wxTimer	m_Timer;
 		PropList	m_PropList;
