@@ -1,4 +1,4 @@
 wxMemMonitor
 ==========
 
-memory monitor using wxWidgets (IDE: vs2010)
+memory monitor using wxWidgets and DIA(debug interface access) library (IDE: vs2010)
