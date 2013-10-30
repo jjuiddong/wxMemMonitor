@@ -8,8 +8,9 @@ float rand_rng() // 0.00 ~ 1.00f
 	return (rand() % 100)/100.f;
 }
 
-CBall::CBall(POINT pos, int radian) : 
-	m_Radius(radian)
+CBall::CBall(const string &name, POINT pos, int radian) : 
+	m_Name(name)
+,	m_Radius(radian)
 ,	m_Color(YELLOW)
 {
 	m_Pos = Vector2((float)pos.x, (float)pos.y);

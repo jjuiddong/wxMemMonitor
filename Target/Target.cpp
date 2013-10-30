@@ -7,6 +7,7 @@
 #include "Target.h"
 #include "Ball.h"
 
+
 #include "../wxMemMonitorLib/wxMemMonitor.h"
 MEMORYMONITOR_INNER_PROCESS();
 
@@ -68,7 +69,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	for (int i=0; i < MAX_BALL_COUNT; ++i)
 	{
 		POINT pt = {(i+1)*30, (i+1)*30};
-		m_Balls.push_back( new CBall( pt, DEFAULT_RADIUS ));
+		std::stringstream ss;
+		ss << "Ball " << i+1;
+		m_Balls.push_back( new CBall(ss.str(), pt, DEFAULT_RADIUS));
 	}
 
 	g_Brush[ 0] = CreateSolidBrush( RGB(255,255,0) );

@@ -11,7 +11,7 @@
 #include <math.h>
 #include <vector>
 #include "../wxMemMonitorLib/wxMemMonitor.h"
-
+using std::string;
 
 struct Vector2
 {
@@ -75,8 +75,8 @@ DECLARE_TYPE_NAME(CBall)
 class CBall : public memmonitor::Monitor<CBall, TYPE_NAME(CBall)>
 {
 public:
-	CBall() { m_Color = YELLOW;}
-	CBall(POINT pos, int radian);
+	CBall() {}
+	CBall(const string &name, POINT pos, int radian);
 	virtual ~CBall() {}
 
 	enum Color
@@ -88,6 +88,7 @@ public:
 	};
 
 protected:
+	string m_Name;
 	Vector2 m_Pos;
 	Vector2 m_Velocity;
 	int m_Radius;
