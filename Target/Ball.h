@@ -75,7 +75,7 @@ DECLARE_TYPE_NAME(CBall)
 class CBall : public memmonitor::Monitor<CBall, TYPE_NAME(CBall)>
 {
 public:
-	CBall() {}
+	CBall() { m_Color = YELLOW;}
 	CBall(POINT pos, int radian);
 	virtual ~CBall() {}
 

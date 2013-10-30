@@ -25,7 +25,6 @@ const int MAX_BALL_COUNT = 30;
 const int DEFAULT_RADIUS = 10;
 HBRUSH g_Brush[ 4];
 
-
 // 이 코드 모듈에 들어 있는 함수의 정방향 선언입니다.
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
