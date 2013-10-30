@@ -23,6 +23,8 @@ TCHAR szWindowClass[MAX_LOADSTRING];			// 기본 창 클래스 이름입니다.
 std::vector<CBall*> m_Balls;
 const int MAX_BALL_COUNT = 30;
 const int DEFAULT_RADIUS = 10;
+HBRUSH g_Brush[ 4];
+
 
 // 이 코드 모듈에 들어 있는 함수의 정방향 선언입니다.
 ATOM				MyRegisterClass(HINSTANCE hInstance);
@@ -70,6 +72,11 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		m_Balls.push_back( new CBall( pt, DEFAULT_RADIUS ));
 	}
 
+	g_Brush[ 0] = CreateSolidBrush( RGB(255,255,0) );
+	g_Brush[ 1] = CreateSolidBrush( RGB(0,255,0) );
+	g_Brush[ 2] = CreateSolidBrush( RGB(0, 0, 255) );
+	g_Brush[ 3] = CreateSolidBrush( RGB(255,0,0) );
+
 	// 기본 메시지 루프입니다.
 	int oldT = GetTickCount();
 	while (GetMessage(&msg, NULL, 0, 0))
@@ -88,6 +95,11 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	for (int i=0; i < MAX_BALL_COUNT; ++i)
 		delete m_Balls[ i];
+	DeleteObject(g_Brush[ 0] );
+	DeleteObject(g_Brush[ 1] );
+	DeleteObject(g_Brush[ 2] );
+	DeleteObject(g_Brush[ 3] );
+
 	memmonitor::Cleanup();
 	return (int) msg.wParam;
 }
@@ -222,6 +234,7 @@ void Paint(HWND hWnd, HDC hdc)
 	for(size_t i=0; i < m_Balls.size(); ++i)
 	{
 		RECT r = m_Balls[ i]->GetRect();
+		SelectObject(hdcMem, g_Brush[ m_Balls[ i]->GetColor()] );
 		::Ellipse(hdcMem,  r.left, r.top, r.right, r.bottom);
 	}
 
