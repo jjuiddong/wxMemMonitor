@@ -36,6 +36,7 @@ namespace memmonitor
 		void OnMenuExit(wxCommandEvent& event);
 		void OnMenuHelp(wxCommandEvent& event);
 		void OnPropertyFrameClose(wxCloseEvent& event);
+		void OnKeyDown(wxKeyEvent& event);
 		
 	private:
 		wxAuiManager m_mgr;

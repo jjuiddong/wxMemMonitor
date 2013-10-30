@@ -29,10 +29,10 @@ namespace visualizer
 	// make property
 	bool	MakeVisualizerProperty( CPropertyWindow *pPropertiesWnd, 
 		wxPGProperty *pParentProp, 
-		const SMemInfo &memInfo, const std::string &symbolName );
+		const SMemInfo &memInfo, const std::string &symbolName, const int depth );
 
 	bool	MakeVisualizerProperty( CPropertyWindow *pPropertiesWnd, 
-		wxPGProperty *pParentProp, const SSymbolInfo &symbol );
+		wxPGProperty *pParentProp, const SSymbolInfo &symbol, const int depth );
 
 	// find
 	bool Find_ChildSymbol(  const std::string findSymbolName, 

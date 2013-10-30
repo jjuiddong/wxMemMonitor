@@ -8,6 +8,8 @@
 #include "../dia/DiaWrapper.h"
 #include "../visualizer/PropertyMaker.h"
 #include "../memory/SharedMemoryMng.h"
+#include <shlwapi.h>
+#pragma comment(lib, "shlwapi")
 
 
 using namespace memmonitor;
@@ -23,13 +25,11 @@ BEGIN_EVENT_TABLE(CFrame, wxFrame)
 	 EVT_MENU (MENU_OPEN_AUTOEXP, CFrame::OnMenuOpenAutoExp)
 	 EVT_MENU (MENU_EXIT, CFrame::OnMenuExit)
 	 EVT_MENU (MENU_HELP, CFrame::OnMenuHelp)
- 	//EVT_KEY_DOWN(CFrame::OnKeyDown)
 END_EVENT_TABLE()
 
 
 CFrame::CFrame(wxWindow* parent) : wxFrame(parent, -1, _("wxMemMonitor"),
-	wxDefaultPosition, wxSize(400,500),
-	wxDEFAULT_FRAME_STYLE)
+	wxDefaultPosition, wxSize(400,500), wxDEFAULT_FRAME_STYLE)
 ,	m_pMemTree(NULL)
 ,	m_pLogWnd(NULL)
 ,	m_pPropWnd(NULL)
@@ -65,6 +65,14 @@ CFrame::CFrame(wxWindow* parent) : wxFrame(parent, -1, _("wxMemMonitor"),
 		ReadConfigFile( GetConfigFileName() );
 		RepositioningWindow();
 	}
+
+	// TitleBar setting
+	char moduleName[ MAX_PATH] = "";  
+	GetModuleFileNameA(GethInstance(), moduleName, MAX_PATH);
+	char *name = PathFindFileNameA(moduleName);
+	SetTitle(name);
+
+	Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CFrame::OnKeyDown));
 
 }
 
@@ -178,4 +186,17 @@ void CFrame::UpdatePaneSize(wxWindow *pWindow, int w, int h)
 	pane.MinSize(w,h);
 	m_mgr.Update();
 	pane.MinSize(10,10);
+}
+
+
+/**
+@brief  OnKeyDown
+*/
+void CFrame::OnKeyDown(wxKeyEvent& event)
+{
+	event.Skip();
+	if (346 == event.GetKeyCode()) // VK_F7
+	{
+		Hide();
+	}
 }

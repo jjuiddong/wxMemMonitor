@@ -6,8 +6,7 @@
 #include "Global.h"
 #include "../ui/LogWindow.h"
 #include "../dia/DiaWrapper.h"
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
+
 
 namespace memmonitor
 {
@@ -36,6 +35,7 @@ void CApp::OnTerminate(wxThreadEvent& WXUNUSED(event))
 	OnExit();
 }
 
+
 //------------------------------------------------------------------------
 // load config file
 // init dia library
@@ -45,6 +45,7 @@ bool memmonitor::Init(EXECUTE_TYPE type, HINSTANCE hInst, const std::string conf
 {
 	SetExecuteType(type);
 	SetConfigFileName(configFileName);
+	SethInstance(hInst);
 
 	if (IsThreadRunning)
 	{
@@ -67,6 +68,25 @@ bool memmonitor::Init(EXECUTE_TYPE type, HINSTANCE hInst, const std::string conf
 		return (GetLastError().empty()? true : false);
 	}
 
+	return true;
+}
+
+
+/**
+ @brief Show
+ */
+bool memmonitor::ShowToggle()
+{
+	if (wxTheApp)
+	{
+		if (wxTheApp->GetTopWindow())
+		{
+			if (wxTheApp->GetTopWindow()->IsShown())
+				wxTheApp->GetTopWindow()->Hide();
+			else
+				wxTheApp->GetTopWindow()->Show(true);
+		}
+	}	
 	return true;
 }
 

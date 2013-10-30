@@ -88,7 +88,12 @@ void CMemoryTree::OnRefreshTimer(wxTimerEvent& event)
 //------------------------------------------------------------------------
 void CMemoryTree::OnTreectrlSelChanged( wxTreeEvent& event )
 {
+	m_pTree->SetItemTextColour( event.GetItem(), wxColour(0,0,255) );
+	if (event.GetOldItem())
+		m_pTree->SetItemTextColour( event.GetOldItem(), wxColour(0,0,0) );
+
 	const wxString text = m_pTree->GetItemText( event.GetItem() );
+
 	PropWindowPtr pPropWnd = GetPropertyWindow();
 	RET(!pPropWnd);
 	pPropWnd->UpdateSymbol( text );

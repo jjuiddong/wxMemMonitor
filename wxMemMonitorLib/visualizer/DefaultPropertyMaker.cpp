@@ -13,40 +13,51 @@ namespace visualizer
 {
 	using namespace parser;
 
+	struct SVisOption
+	{
+		int depth;
+		bool isApplyVisualizer;
+		SVisOption() {}
+		SVisOption(int _depth, bool _isApplyVisualizer) : depth(_depth), isApplyVisualizer(_isApplyVisualizer) {}
+	}; 
+
+
 	// make property
-	void		MakeProperty_Root(wxPGProperty *pParentProp, const SSymbolInfo &symbol,
-		const bool IsUdtExpand, const int depth  );
+	void		MakeProperty_Preview(wxPGProperty *pParentProp, const SSymbolInfo &symbol,
+		const bool IsUdtExpand, const SVisOption &option  );
 
 	bool		MakeProperty_Child(  wxPGProperty *pParentProp,  const SSymbolInfo &symbol, 
-		const bool IsUdtExpand, const int depth );
+		const bool IsUdtExpand, const SVisOption &option );
+
+
 
 	void		MakeProperty_UDTChild(wxPGProperty *pParentProp, const SSymbolInfo &symbol, 
-		const bool IsUdtExpand, const int depth );
+		const bool IsUdtExpand, const SVisOption &option );
 
 	void		MakeProperty_BaseClass(wxPGProperty *pParentProp, const SSymbolInfo &symbol, 
-		const bool IsUdtExpand, const int depth );
+		const bool IsUdtExpand, const SVisOption &option );
 
-	void		MakeProperty_Pointer(wxPGProperty *pParentProp, const SSymbolInfo &symbol, 
-		const bool IsUdtExpand, const int depth );
+	void		MakeProperty_Pointer_Children(wxPGProperty *pParentProp, const SSymbolInfo &symbol, 
+		const bool IsUdtExpand, const SVisOption &option );
 
 	void		MakeProperty_Data(wxPGProperty *pParentProp, const SSymbolInfo &symbol, 
-		const bool IsUdtExpand, const int depth );
+		const bool IsUdtExpand, const SVisOption &option );
 
 	void		MakeProperty_Array(wxPGProperty *pParentProp, const SSymbolInfo &symbol, 
-		const bool IsUdtExpand, const int depth );
+		const bool IsUdtExpand, const SVisOption &option );
 
 
 	wxPGProperty* MakeProperty_BaseType(wxPGProperty *pParentProp, 
 		const std::string valueName,  const SSymbolInfo &symbol );
 
-	wxPGProperty* MakeProperty_PointerData(wxPGProperty *pParentProp, 
+	wxPGProperty* MakeProperty_Pointer_Preview(wxPGProperty *pParentProp, 
 		const SSymbolInfo &symbol );
 
  	wxPGProperty* MakeProperty_ArrayData(wxPGProperty *pParentProp, 
  		const SSymbolInfo &symbol );
 
 	wxPGProperty* MakeProperty_UDTData(wxPGProperty *pParentProp, 
-		const SSymbolInfo &symbol );
+		const SSymbolInfo &symbol, const SVisOption &option );
 
 	wxPGProperty* MakeProperty_BaseClassData(wxPGProperty *pParentProp, 
 		const SSymbolInfo &symbol);
@@ -59,7 +70,6 @@ namespace visualizer
 
 	// variables
 	CPropertyWindow *g_pProperty = NULL;
-	bool g_IsApplyVisualizer = true;
 }
 
 using namespace dia;
@@ -67,22 +77,13 @@ using namespace std;
 using namespace visualizer;
 using namespace memmonitor;
 
-//------------------------------------------------------------------------
-// 기본형식으로 property창에 심볼을 출력한다.
-// symbolName : 심볼 이름  {symbolname#count}
-//------------------------------------------------------------------------
-bool visualizer::MakeProperty_DefaultForm( CPropertyWindow *pProperties,  const string &symbolName )
-{
-	return MakeProperty_DefaultForm(pProperties, NULL, symbolName);
-}
-
 
 /**
 @brief  property창에 심볼을 출력한다.
 @param symbolName : {symbolName#count} 메모리 정보를 얻어올 수 있는 형태
 */
 bool	visualizer::MakeProperty_DefaultForm( CPropertyWindow *pProperties,  wxPGProperty *pParentProp,
-	const std::string &symbolName )
+	const std::string &symbolName, const bool IsApplyVisualizer, const int depth )
 {
 	const std::string str = ParseObjectName(symbolName);
 	IDiaSymbol *pSymbol = dia::FindType(str);
@@ -96,7 +97,7 @@ bool	visualizer::MakeProperty_DefaultForm( CPropertyWindow *pProperties,  wxPGPr
 	}
 
 	memInfo.name = symbolName;
-	MakeProperty_DefaultForm(pProperties, pParentProp, SSymbolInfo(pSymbol, memInfo));
+	MakeProperty_DefaultForm(pProperties, pParentProp, SSymbolInfo(pSymbol, memInfo), IsApplyVisualizer, depth);
 	return true;
 }
 
@@ -106,14 +107,13 @@ bool	visualizer::MakeProperty_DefaultForm( CPropertyWindow *pProperties,  wxPGPr
 //------------------------------------------------------------------------
 bool visualizer::MakeProperty_DefaultForm(  CPropertyWindow *pProperties,
 				wxPGProperty *pParentProp,  const SSymbolInfo &symbol,
-				bool IsApplyVisualizer ) // IsApplyVisualizer = true
+				const bool IsApplyVisualizer, const int depth)
 {
 	if (!symbol.mem.ptr)
 		return true;
 
 	g_pProperty = pProperties;
-	g_IsApplyVisualizer = IsApplyVisualizer;
-	MakeProperty_Root(pParentProp, symbol, true, 2);
+	MakeProperty_Preview(pParentProp, symbol, true, SVisOption(depth, IsApplyVisualizer));
 	return true;
 }
 
@@ -123,20 +123,19 @@ bool visualizer::MakeProperty_DefaultForm(  CPropertyWindow *pProperties,
 //------------------------------------------------------------------------
 bool	 visualizer::MakePropertyChild_DefaultForm(  CPropertyWindow *pProperties, 
 												   wxPGProperty *pParentProp,  const SSymbolInfo &symbol, 
-												   bool IsApplyVisualizer) // , IsApplyVisualizer = true
+												   const bool IsApplyVisualizer, const int depth)
 {
 	if (!symbol.mem.ptr)
 		return true;
 
 	g_pProperty = pProperties;
-	g_IsApplyVisualizer = IsApplyVisualizer;
 
 	bool isVisualizerType = false;
-	if (g_IsApplyVisualizer)
-		isVisualizerType = visualizer::MakeVisualizerProperty( pProperties, pParentProp, symbol );
+	if (IsApplyVisualizer)
+		isVisualizerType = visualizer::MakeVisualizerProperty( pProperties, pParentProp, symbol, depth );
 
 	if (!isVisualizerType)
-		MakeProperty_Child(pParentProp, symbol, true, 2);
+		MakeProperty_Child(pParentProp, symbol, true, SVisOption(depth, IsApplyVisualizer));
 	return true;
 }
 
@@ -145,9 +144,10 @@ bool	 visualizer::MakePropertyChild_DefaultForm(  CPropertyWindow *pProperties,
 //  symbol을 pParentProp의 자식으로 추가한다.
 //------------------------------------------------------------------------
 bool	 visualizer::MakeProperty_Child(  wxPGProperty *pParentProp,  const SSymbolInfo &symbol, 
-	const bool IsUdtExpand, const int depth )
+	const bool IsUdtExpand, const SVisOption &option )
 {
-	if (depth <= 0)
+	const bool IsChildExpand = (pParentProp && pParentProp->GetChildCount() > 0);
+	if (option.depth <= 0 && !IsChildExpand)
 		return true;
 	enum SymTagEnum symtag;
 	if (S_OK != symbol.pSym->get_symTag((DWORD*)&symtag))
@@ -156,19 +156,19 @@ bool	 visualizer::MakeProperty_Child(  wxPGProperty *pParentProp,  const SSymbol
 	switch (symtag)
 	{
 	case SymTagArrayType:
-		MakeProperty_Array(pParentProp, symbol, IsUdtExpand, depth);
+		MakeProperty_Array(pParentProp, symbol, IsUdtExpand, option);
 		break;
 
 	case SymTagPointerType:
-		MakeProperty_Pointer(pParentProp, symbol, IsUdtExpand, depth);
+		MakeProperty_Pointer_Children(pParentProp, symbol, IsUdtExpand, option);
 		break;
 
 	case SymTagBaseClass:
-		MakeProperty_BaseClass(pParentProp, symbol, IsUdtExpand, depth);
+		MakeProperty_BaseClass(pParentProp, symbol, IsUdtExpand, option);
 		break;
 
 	case SymTagUDT:
-		MakeProperty_UDTChild(pParentProp, symbol, IsUdtExpand, depth);
+		MakeProperty_UDTChild(pParentProp, symbol, IsUdtExpand, option);
 		break;
 
 	case SymTagData: 
@@ -177,7 +177,7 @@ bool	 visualizer::MakeProperty_Child(  wxPGProperty *pParentProp,  const SSymbol
 			HRESULT hr = symbol.pSym->get_type(&pBaseType);
 			ASSERT_RETV(S_OK == hr, false);
 			MakeProperty_Child(pParentProp, SSymbolInfo(pBaseType,symbol.mem), 
-				IsUdtExpand, depth);
+				IsUdtExpand, option);
 		}
 		break;
 
@@ -194,10 +194,11 @@ bool	 visualizer::MakeProperty_Child(  wxPGProperty *pParentProp,  const SSymbol
 //------------------------------------------------------------------------
 // Property 생성
 //------------------------------------------------------------------------
-void visualizer::MakeProperty_Root(wxPGProperty *pParentProp, const SSymbolInfo &symbol, 
-	const bool IsUdtExpand, const int depth )
+void visualizer::MakeProperty_Preview(wxPGProperty *pParentProp, const SSymbolInfo &symbol, 
+	const bool IsUdtExpand, const SVisOption &option )
 {
-	if (depth <= 0)
+	const bool IsChildExpand = (pParentProp && pParentProp->GetChildCount() > 0);
+	if (option.depth <= 0 && !IsChildExpand)
 		return;
 	enum SymTagEnum symtag;
 	if (S_OK != symbol.pSym->get_symTag((DWORD*)&symtag))
@@ -211,27 +212,29 @@ void visualizer::MakeProperty_Root(wxPGProperty *pParentProp, const SSymbolInfo 
 		break;
 
 	case SymTagData: 
-		MakeProperty_Data(pParentProp, symbol, IsUdtExpand, depth);
+		MakeProperty_Data(pParentProp, symbol, IsUdtExpand, option);
 		break;
 
 	case SymTagArrayType:
-		MakeProperty_Array(pParentProp, symbol, IsUdtExpand, depth);
+		MakeProperty_Array(pParentProp, symbol, IsUdtExpand, option);
 		break;
 
 	case SymTagPointerType:
-		MakeProperty_Pointer(pParentProp, symbol, IsUdtExpand, depth);
+		pProp = MakeProperty_Pointer_Preview(pParentProp, symbol);
+		if (pProp)
+			MakeProperty_Child(pProp, symbol, IsUdtExpand, option);
 		break;
 
 	case SymTagBaseClass:
 		pProp = MakeProperty_BaseClassData(pParentProp, symbol);
 		if (pProp)
-			MakeProperty_Child(pProp, symbol, IsUdtExpand, depth);
+			MakeProperty_Child(pProp, symbol, IsUdtExpand, option);
 		break;
 
 	case SymTagUDT:
-		pProp = MakeProperty_UDTData(pParentProp, symbol);
+		pProp = MakeProperty_UDTData(pParentProp, symbol, option);
 		if (pProp)
-			MakeProperty_Child(pProp, symbol, IsUdtExpand, depth);
+			MakeProperty_Child(pProp, symbol, IsUdtExpand, option);
 		break;
 
 	case SymTagTypedef:
@@ -251,7 +254,7 @@ void visualizer::MakeProperty_Root(wxPGProperty *pParentProp, const SSymbolInfo 
  */
 void	visualizer ::MakeProperty_BaseClass(wxPGProperty *pParentProp, 
 											const SSymbolInfo &symbol, 
-											const bool IsUdtExpand, const int depth )
+											const bool IsUdtExpand, const SVisOption &option )
 {
 	IDiaSymbol* pBaseType;
 	HRESULT hr = symbol.pSym->get_type(&pBaseType);
@@ -261,7 +264,7 @@ void	visualizer ::MakeProperty_BaseClass(wxPGProperty *pParentProp,
 	const LONG offset = dia::GetSymbolLocation(symbol.pSym, &locType);
 	BYTE *ptr = (BYTE*)symbol.mem.ptr + offset;
 	SMemInfo newMemInfo(symbol.mem.name.c_str(), ptr, 0);
-	MakeProperty_Child(pParentProp, SSymbolInfo(pBaseType, newMemInfo), IsUdtExpand, depth);
+	MakeProperty_Child(pParentProp, SSymbolInfo(pBaseType, newMemInfo), IsUdtExpand, option);
 }
 
 
@@ -283,11 +286,12 @@ wxPGProperty* visualizer::MakeProperty_BaseClassData(
 //------------------------------------------------------------------------
 void visualizer ::MakeProperty_UDTChild(wxPGProperty *pParentProp, 
 										const SSymbolInfo &symbol, 
-										const bool IsUdtExpand, const int depth)
+										const bool IsUdtExpand, const SVisOption &option)
 {
 	RET (!pParentProp);
-
-	if (depth > 0)
+	
+	const bool IsChildExpand = (pParentProp && pParentProp->GetChildCount() > 0);
+	if (option.depth > 0 || IsChildExpand)
 	{
 		CComPtr<IDiaEnumSymbols> pEnumChildren;
 		if (SUCCEEDED(symbol.pSym->findChildren(SymTagNull, NULL, nsNone, &pEnumChildren))) 
@@ -296,12 +300,32 @@ void visualizer ::MakeProperty_UDTChild(wxPGProperty *pParentProp,
 			ULONG celt = 0;
 			while (SUCCEEDED(pEnumChildren->Next(1, &pChild, &celt)) && (celt == 1)) 
 			{
-				bool childIsUdtExpand = IsUdtExpand;
-				int childDepth = depth - 1;
-				if (IsUdtExpand && (depth == 2))
+				enum SymTagEnum childSymTag;
+				HRESULT hr = pChild->get_symTag((DWORD*)&childSymTag);
+				switch (childSymTag)
 				{
-					enum SymTagEnum childSymTag;
-					HRESULT hr = pChild->get_symTag((DWORD*)&childSymTag);
+				case SymTagUDT:
+				case SymTagData:
+				case SymTagEnum:
+				case SymTagPointerType:
+				case SymTagBaseType:
+				case SymTagTypedef:
+				case SymTagBaseClass:
+					// process types
+					break;
+
+				case SymTagVTable:
+					break;
+
+				default:
+					pChild->Release();
+					continue;
+				}
+
+				bool childIsUdtExpand = IsUdtExpand;
+				int childDepth = option.depth - 1;
+				if (IsUdtExpand && (option.depth == 2))
+				{
 					if (SymTagUDT == childSymTag || SymTagBaseClass == childSymTag)
 					{
 						childIsUdtExpand = false;
@@ -313,20 +337,21 @@ void visualizer ::MakeProperty_UDTChild(wxPGProperty *pParentProp,
 				SMemInfo memberMemInfo;
 				memberMemInfo.name = dia::GetSymbolName(pChild);
 				memberMemInfo.ptr = (BYTE*)symbol.mem.ptr + offset;
-				MakeProperty_Root(pParentProp, SSymbolInfo(pChild, memberMemInfo), 
-					childIsUdtExpand, childDepth);
+				MakeProperty_Preview(pParentProp, SSymbolInfo(pChild, memberMemInfo), 
+					childIsUdtExpand, SVisOption(childDepth, option.isApplyVisualizer));
 			}
 		}
 	}
-	pParentProp->SetExpanded(false);
+	if (!IsChildExpand || (IsChildExpand && !pParentProp->IsExpanded()))
+		pParentProp->SetExpanded(false);
 }
 
 
 //------------------------------------------------------------------------
 // Pointer 타입 출력 
 //------------------------------------------------------------------------
-void	visualizer ::MakeProperty_Pointer(wxPGProperty *pParentProp, const SSymbolInfo &symbol,
-										  const bool IsUdtExpand, const int depth)
+void	visualizer::MakeProperty_Pointer_Children(wxPGProperty *pParentProp, const SSymbolInfo &symbol,
+										  const bool IsUdtExpand, const SVisOption &option)
 {
 	IDiaSymbol* pBaseType;
 	HRESULT hr = symbol.pSym->get_type(&pBaseType);
@@ -344,8 +369,8 @@ void	visualizer ::MakeProperty_Pointer(wxPGProperty *pParentProp, const SSymbolI
 		if (newPtr) 
 		{
 			SMemInfo ptrMemInfo(symbol.mem.name.c_str(), newPtr, (size_t)0);
-			MakeProperty_Root(pParentProp, SSymbolInfo(pBaseType, ptrMemInfo, false), 
-				IsUdtExpand, depth);
+			MakeProperty_Child(pParentProp, SSymbolInfo(pBaseType, ptrMemInfo, false), 
+				IsUdtExpand, option);
 		}
 	}
 	pBaseType->Release();
@@ -357,7 +382,7 @@ void	visualizer ::MakeProperty_Pointer(wxPGProperty *pParentProp, const SSymbolI
 // 변수 이름과 타입, 값을 설정한다.
 //------------------------------------------------------------------------
 void visualizer ::MakeProperty_Data(wxPGProperty *pParentProp, const SSymbolInfo &symbol,
-									const bool IsUdtExpand, const int depth)
+									const bool IsUdtExpand, const SVisOption &option)
 {
 	IDiaSymbol* pBaseType;
 	HRESULT hr = symbol.pSym->get_type(&pBaseType);
@@ -373,7 +398,7 @@ void visualizer ::MakeProperty_Data(wxPGProperty *pParentProp, const SSymbolInfo
 	case SymTagBaseType:
 		{
 			string valueTypeName = symbol.mem.name;// + " (" + dia::GetSymbolTypeName(symbol.pSym) + ")";
-			MakeProperty_BaseType( pParentProp, valueTypeName, symbol);
+			MakeProperty_BaseType( pParentProp, valueTypeName, symbol );
 		}
 		break;
 
@@ -407,21 +432,21 @@ void visualizer ::MakeProperty_Data(wxPGProperty *pParentProp, const SSymbolInfo
 		break;
 
 	case SymTagUDT:
-		pPgProp = MakeProperty_UDTData(pParentProp, symbol);
+		pPgProp = MakeProperty_UDTData(pParentProp, symbol, option);
 		if (pPgProp)
-			MakeProperty_Child(pPgProp, SSymbolInfo(pBaseType, symbol.mem), IsUdtExpand, depth-1);
+			MakeProperty_Child(pPgProp, SSymbolInfo(pBaseType, symbol.mem), IsUdtExpand, SVisOption(option.depth-1, option.isApplyVisualizer));
 		break;
 
 	case SymTagArrayType:
 		pPgProp = MakeProperty_ArrayData(pParentProp, symbol);
 		if (pPgProp)
-			MakeProperty_Child(pPgProp, SSymbolInfo(pBaseType, symbol.mem), IsUdtExpand, depth-1);
+			MakeProperty_Child(pPgProp, SSymbolInfo(pBaseType, symbol.mem), IsUdtExpand, SVisOption(option.depth-1, option.isApplyVisualizer));
 		break;
 
 	case SymTagPointerType:
-		pPgProp = MakeProperty_PointerData(pParentProp, symbol);
+		pPgProp = MakeProperty_Pointer_Preview(pParentProp, SSymbolInfo(pBaseType, symbol.mem));
 		if (pPgProp)
-			MakeProperty_Child(pPgProp, SSymbolInfo(pBaseType, symbol.mem), IsUdtExpand, depth-1);
+			MakeProperty_Child(pPgProp, SSymbolInfo(pBaseType, symbol.mem, false), IsUdtExpand, SVisOption(option.depth-1, option.isApplyVisualizer));
 		break;
 
 	default:
@@ -493,17 +518,21 @@ wxPGProperty* visualizer::MakeProperty_ArrayData(wxPGProperty *pParentProp,
 //------------------------------------------------------------------------
 // Pointer Type Preview 
 //------------------------------------------------------------------------
-wxPGProperty* visualizer::MakeProperty_PointerData(
+wxPGProperty* visualizer::MakeProperty_Pointer_Preview(
 	wxPGProperty *pParentProp, const SSymbolInfo &symbol )
 {
 	wxPGProperty *pProp = NULL;
 
-	CComPtr<IDiaSymbol> pPointerType;
-	HRESULT hr = symbol.pSym->get_type(&pPointerType);
-	ASSERT_RETV(hr == S_OK, pProp);  // PointerType
+	//CComPtr<IDiaSymbol> pPointerType;
+	//HRESULT hr = symbol.pSym->get_type(&pPointerType);
+	//ASSERT_RETV(hr == S_OK, pProp);  // PointerType
+
+	//CComPtr<IDiaSymbol> pBaseType;
+	//hr = pPointerType->get_type(&pBaseType);
+	//ASSERT_RETV(hr == S_OK, pProp);  // BasicDataType or UDTDataType
 
 	CComPtr<IDiaSymbol> pBaseType;
-	hr = pPointerType->get_type(&pBaseType);
+	HRESULT hr = symbol.pSym->get_type(&pBaseType);
 	ASSERT_RETV(hr == S_OK, pProp);  // BasicDataType or UDTDataType
 
 	void *srcPtr = (void*)*(DWORD*)symbol.mem.ptr;
@@ -556,7 +585,7 @@ wxPGProperty* visualizer::MakeProperty_PointerData(
 // UDT type Preview
 //------------------------------------------------------------------------
 wxPGProperty* visualizer::MakeProperty_UDTData(
-	wxPGProperty *pParentProp, const SSymbolInfo &symbol ) //  IsApplyVisualizer = true
+	wxPGProperty *pParentProp, const SSymbolInfo &symbol, const SVisOption &option ) //  IsApplyVisualizer = true
 {
 	const string typeName = dia::GetSymbolTypeName(symbol.pSym);
 
@@ -567,18 +596,23 @@ wxPGProperty* visualizer::MakeProperty_UDTData(
 	CPropertyItemAdapter prop( ss.str());
 	AddProperty(pParentProp, prop, &symbol, &STypeData(SymTagUDT, VT_EMPTY, symbol.mem.ptr));
 
+	const bool isExpand = (prop.GetProperty() && (prop.GetProperty()->GetChildCount() > 0)
+		&& prop.GetProperty()->IsExpanded());
+
 	bool isVisualizerType = false;
 	// todo: visualizer preview 작업이 끝나면 없애야한다.
-	if (!strncmp(typeName.c_str(),  "std::basic_string",17 ))
+	if (option.isApplyVisualizer && !strncmp(typeName.c_str(),  "std::basic_string",17 ))
 	{
-		isVisualizerType = visualizer::MakeVisualizerProperty( g_pProperty, prop.GetProperty(), symbol );
+		isVisualizerType = visualizer::MakeVisualizerProperty( g_pProperty, prop.GetProperty(), symbol, option.depth );
+	}
+	else if(option.isApplyVisualizer)
+	{
+		isVisualizerType = visualizer::MakeVisualizerProperty( g_pProperty, prop.GetProperty(), symbol, option.depth );
+	}
+
+	if (!isExpand)
 		prop.GetProperty()->SetExpanded(false);
-	}
-	else if (g_IsApplyVisualizer)
-	{
-		isVisualizerType = visualizer::MakeVisualizerProperty( g_pProperty, prop.GetProperty(), symbol );
-	}
-	
+
 	return (isVisualizerType)? NULL : prop.GetProperty();
 }
 
@@ -587,7 +621,7 @@ wxPGProperty* visualizer::MakeProperty_UDTData(
 // pSymbol : Array Type을 가리킨다. 
 //------------------------------------------------------------------------
 void visualizer ::MakeProperty_Array(wxPGProperty *pParentProp, 
-	const SSymbolInfo &symbol, const bool IsUdtExpand, const int depth)
+	const SSymbolInfo &symbol, const bool IsUdtExpand, const SVisOption &option)
 {
 	ULONGLONG length=0;
 	HRESULT hr = symbol.pSym->get_length(&length);
@@ -621,7 +655,6 @@ void visualizer ::MakeProperty_Array(wxPGProperty *pParentProp,
 			SMemInfo arrayElem(valueName, ptr, (size_t)element_length);
 			MakeProperty_BaseType(pParentProp, valueName, SSymbolInfo(pElementType, arrayElem, false));
 		}
-		//pParentProp->Expand(FALSE); // 일단 접어놓는다.
 		pParentProp->SetExpanded(false);
 	}
 	else // UDT Array
@@ -638,9 +671,8 @@ void visualizer ::MakeProperty_Array(wxPGProperty *pParentProp,
  			CPropertyItemAdapter prop( valueName );
 			AddProperty( pParentProp, prop, &arraySymbol, &STypeData(SymTagUDT,VT_EMPTY,NULL));
 
-			MakeProperty_Root(prop.GetProperty(), arraySymbol, IsUdtExpand, depth);
+			MakeProperty_Preview(prop.GetProperty(), arraySymbol, IsUdtExpand, option);
 		}
-		//pParentProp->Expand(FALSE); // 일단 접어놓는다.
 		pParentProp->SetExpanded(false);
 	}
 	pElementType->Release();

@@ -35,6 +35,8 @@ namespace memmonitor
 	PropWindowPtr		GetPropertyWindow();
 	FramePtr					GetFrame();
 
+	void							SethInstance(HINSTANCE hInstance);
+	HINSTANCE				GethInstance();
 	const std::string&	GetConfigFileName();
 	void							SetConfigFileName(const std::string &fileName);
 	const std::string&	GetErrorMsg();

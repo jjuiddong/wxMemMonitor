@@ -42,10 +42,13 @@ namespace memmonitor
 		wxPGProperty*	AddProperty(wxPGProperty *pParentProp, CPropertyItemAdapter &propAdapter, 
 			const visualizer::SSymbolInfo *pSymbol, STypeData *pTypeData);
 
+		void	RemoveChildProperty( wxPGProperty *pParentProp );
+
 	protected:
 		void CheckSymbol( const wxString &symbolName );
 		bool	FindSymbolUpward( wxPGProperty *pProp, OUT visualizer::SSymbolInfo *pOut );
 		void	RefreshPropertyItem( wxPGProperty *pProp );
+		void RemovePropClientData( wxPGProperty *pParentProp );
 		void ClearPropItem();
 
 		// Event Handler

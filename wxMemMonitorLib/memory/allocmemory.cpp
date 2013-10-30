@@ -175,7 +175,7 @@ bool	memmonitor::CheckValidAddress(const void *ptr )
 {
 	switch (GetExecuteType())
 	{
-	case INNER_PROCESS: return true;
+	case INNER_PROCESS: return (0xCDCDCDCD == (DWORD)ptr)? false : true;
 	case OUTER_PROCESS: return sharedmemory::CheckValidAddress(ptr);
 	}
 	return false;

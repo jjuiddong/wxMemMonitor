@@ -19,14 +19,13 @@ namespace visualizer
 {
 	using namespace memmonitor;
 
-	bool		MakeProperty_DefaultForm( CPropertyWindow *pProperties,  const std::string &symbolName );
-
 	bool		MakeProperty_DefaultForm( CPropertyWindow *pProperties,  wxPGProperty *pParentProp,
-		const std::string &symbolName );
+		const std::string &symbolName, const bool IsApplyVisualizer, const int depth );
 
 	bool		MakeProperty_DefaultForm(  CPropertyWindow *pProperties, wxPGProperty *pParentProp,  
-		const SSymbolInfo &symbol, bool IsApplyVisualizer=true );
+		const SSymbolInfo &symbol, const bool IsApplyVisualizer, const int depth );
 
 	bool		MakePropertyChild_DefaultForm(  CPropertyWindow *pProperties, wxPGProperty *pParentProp,  
-		const SSymbolInfo &symbol, bool IsApplyVisualizer=true );
+		const SSymbolInfo &symbol, const bool IsApplyVisualizer, const int depth );
+
 }

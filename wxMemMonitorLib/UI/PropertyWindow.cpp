@@ -76,7 +76,7 @@ void CPropertyWindow::UpdateSymbol( const wxString &symbolName )
 
 	std::string tmpStr = symbolName;
 	std::string str = ParseObjectName(tmpStr);
-	const bool result = visualizer::MakeProperty_DefaultForm(this, tmpStr);
+	const bool result = visualizer::MakeProperty_DefaultForm(this, NULL, tmpStr, true, 2);
 
 	// root node expand
 	wxPGVIterator it;
@@ -139,6 +139,17 @@ wxPGProperty* CPropertyWindow::AddProperty( wxPGProperty *pParentProp,
 			propAdapter.SetProperty(pChildProp);
 			return propAdapter.GetProperty();
 		}
+	}
+	else
+	{
+		int a = 0;
+		//wxPGProperty *pRoot = GetGrid()->GetRoot();
+		//if (pRoot && pRoot->GetName() == prop->GetName())
+		//{
+		//	delete prop;
+		//	propAdapter.SetProperty(pRoot);
+		//	return propAdapter.GetProperty();
+		//}
 	}
 
 	// setting Property Item Infomation
@@ -243,7 +254,7 @@ void CPropertyWindow::OnPropertyGridSelect( wxPropertyGridEvent& event )
 			ptr = visualizer::Point2PointValue((DWORD)pItemData->typeData.ptr);
 
 		SSymbolInfo symbol( pSym, memmonitor::SMemInfo("*", (void*)ptr, 0) );
-		visualizer::MakePropertyChild_DefaultForm( this, pProp, symbol );
+		visualizer::MakePropertyChild_DefaultForm( this, pProp, symbol, true, 2 );
 
 			
 		//if (!FindSymbolUpward( pProp, &symbol ))
@@ -399,7 +410,7 @@ void CPropertyWindow::OnKeyDown(wxKeyEvent& event)
 		if (pRoot)
 		{
 			const std::string symbolName = m_CurrentSymbolName;
-			const bool result = visualizer::MakeProperty_DefaultForm(this, pRoot, symbolName);
+			const bool result = visualizer::MakeProperty_DefaultForm(this, pRoot, symbolName, true, 2);
 			Refresh();
 		}
 
@@ -409,5 +420,38 @@ void CPropertyWindow::OnKeyDown(wxKeyEvent& event)
 			it.GetProperty()->SetExpanded( true );
 			break;
 		}
+	}
+}
+
+
+/**
+@brief  자식 프로퍼티 제거
+*/
+void	CPropertyWindow::RemoveChildProperty( wxPGProperty *pParentProp )
+{
+	RET(!pParentProp);
+
+	RemovePropClientData(pParentProp);
+	pParentProp->DeleteChildren();
+	Refresh();
+}
+
+
+/**
+@brief  RemovePropClientData
+*/
+void CPropertyWindow::RemovePropClientData( wxPGProperty *pParentProp )
+{
+	RET(!pParentProp);
+
+	const int size = pParentProp->GetChildCount();
+	for (int i=0; i < size; ++i)
+	{
+		wxPGProperty *pProp = pParentProp->Item(i);
+		RemovePropClientData( pProp );
+		SPropItem *pitem = (SPropItem*)pProp->GetClientData();
+		m_PropList.remove(pitem);
+		SAFE_DELETE(pitem);
+		pProp->SetClientData(NULL);
 	}
 }

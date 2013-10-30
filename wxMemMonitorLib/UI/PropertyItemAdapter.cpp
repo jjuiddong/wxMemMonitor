@@ -116,7 +116,7 @@ void CPropertyItemAdapter::SetVariant(const _variant_t &var)
 	
 	// bool 형일 때, enum 형태의 값으로 바꿔주어야 한다. 
 	if (var.vt == VT_BOOL)
-		wxVar = wxVariant((int)(var.bVal? true : false)); // bool 값은 widgets에서는 0 or 1 값이어야 한다.
+		wxVar = wxVariant((int)(var.bVal? true : false)); // bool 값은 widgets에서는 0/1 값이어야 한다.
 
 	if (m_pProperty->GetChoices().GetCount()) // enum value
 	{

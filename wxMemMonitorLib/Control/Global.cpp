@@ -18,6 +18,7 @@ namespace memmonitor
 	EXECUTE_TYPE g_Type = INNER_PROCESS;
 	std::string g_ErrorMsg;
 	std::string g_ConfigFileName;
+	HINSTANCE g_hInstance;
 
 	// memory map
 	MapType *g_pMemMap = NULL;
@@ -50,7 +51,14 @@ void memmonitor::SetConfigFileName(const std::string &fileName)
 {
 	g_ConfigFileName = fileName;
 }
-
+void	memmonitor::SethInstance(HINSTANCE hInstance)
+{
+	g_hInstance = hInstance;	
+}
+HINSTANCE	memmonitor::GethInstance()
+{
+	return g_hInstance;
+}
 
 MemTreePtr memmonitor::GetMemoryTree()
 {
@@ -219,7 +227,6 @@ bool	memmonitor::InitMemoryMonitor(const std::string &configFileName)
 		ptree props;
 		boost::property_tree::read_json(configFileName.c_str(), props);
 		string pdbPath = props.get<string>("pdbpath");
-		string shareMemoryName = props.get<string>("sharedmemoryname");
 
 		// Pdb Load
 		if (!dia::Init(pdbPath))
@@ -231,6 +238,7 @@ bool	memmonitor::InitMemoryMonitor(const std::string &configFileName)
 
 		if (OUTER_PROCESS == GetExecuteType())
 		{
+			string shareMemoryName = props.get<string>("sharedmemoryname");
 			if (!sharedmemory::Init(shareMemoryName, sharedmemory::SHARED_CLIENT))
 			{
 				SetErrorMsg(
