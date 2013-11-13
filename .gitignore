@@ -165,4 +165,5 @@ pip-log.txt
 
 #custom ignore file
 *~
+config_target.json.windowsize.json
 
