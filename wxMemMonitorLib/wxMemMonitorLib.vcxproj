@@ -69,9 +69,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="common\Log.h" />
     <ClInclude Include="common\Reference.h" />
     <ClInclude Include="common\Singleton.h" />
