@@ -1,4 +1,3 @@
 
 #include "../wxMemMonitorLib/wxMemMonitor.h"
-MEMORYMONITOR_OUTER_PROCESS();
-
+MEMORYMONITOR_OUTER_PROCESS()
