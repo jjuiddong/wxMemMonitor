@@ -1,7 +1,7 @@
 wxMemMonitor
 ==========
 
-memory monitor using wxWidgets (IDE: vs2010)
+memory monitor with wxWidgets (IDE: vs2010)
 
 
 DIA SDK
@@ -14,17 +14,17 @@ wxMemMonitorLib
 ----------------
 
 
-wxWidgets Setting
+wxWidgets Build Setting
 ---------
-- visual studio
- - general->mfc use - static mfc library
- - code generation->runtime library - multi thread debug 
+- project attribute setting 
+ - code generation->runtime library - /MT(release), /MTd(debug)
 
 
 Usage:
 ---------
 ```sh
 #include "../wxMemMonitorLib/wxMemMonitor.h"
+MEMORYMONITOR_INNER_PROCESS();
 if (!memmonitor::Init(memmonitor::INNER_PROCESS,hInstance,"config_target.json" ))
 {
     MessageBoxA(NULL, memmonitor::GetLastError().c_str(), "ERROR", MB_OK);
