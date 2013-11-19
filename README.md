@@ -1,7 +1,7 @@
 wxMemMonitor
 ==========
 
-memory monitor with wxWidgets (IDE: vs2010)
+memory monitor with wxWidgets, DIA SDK (IDE: vs2010)
 
 
 DIA SDK
@@ -15,9 +15,6 @@ wxMemMonitorLib
 
 
 wxWidgets Build Setting
----------
-- project attribute setting 
- - code generation->runtime library - /MT(release), /MTd(debug)
 
 
 Usage:
