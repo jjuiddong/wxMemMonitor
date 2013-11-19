@@ -32,7 +32,7 @@ CApp::CApp()
 void CApp::OnTerminate(wxThreadEvent& WXUNUSED(event))
 {
 	ExitMainLoop();
-	OnExit();
+	//OnExit();
 }
 
 
@@ -117,7 +117,7 @@ void memmonitor::Cleanup()
 	{
 		wxCriticalSectionLocker lock(gs_wxStartupCS);
 
-		if ( gs_wxMainThread )
+		if (gs_wxMainThread)
 		{
 			// If wx main thread is running, we need to stop it. To accomplish this,
 			// send a message telling it to terminate the app.
@@ -137,8 +137,8 @@ void memmonitor::Cleanup()
 
 	if (INNER_PROCESS == GetExecuteType())
 	{
-		if ( wxTheApp )
-			wxTheApp->OnExit();
+		//if (wxTheApp)
+		//	wxTheApp->OnExit();
 		wxEntryCleanup();
 	}
 
