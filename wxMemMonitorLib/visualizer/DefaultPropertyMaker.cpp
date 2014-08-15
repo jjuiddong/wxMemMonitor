@@ -194,7 +194,7 @@ bool	 visualizer::MakeProperty_Child(  wxPGProperty *pParentProp,  const SSymbol
 //------------------------------------------------------------------------
 // Property »ý¼º
 //------------------------------------------------------------------------
-void visualizer::MakeProperty_Preview(wxPGProperty *pParentProp, const SSymbolInfo &symbol, 
+void visualizer::MakeProperty_Preview( wxPGProperty *pParentProp, const SSymbolInfo &symbol, 
 	const bool IsUdtExpand, const SVisOption &option )
 {
 	const bool IsChildExpand = (pParentProp && pParentProp->GetChildCount() > 0);
